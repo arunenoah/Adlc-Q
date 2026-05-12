@@ -112,16 +112,16 @@ const TaskRow: React.FC<{
           {isBusy && <span style={{ color: C.accent, marginLeft: 4 }}>· running {Math.floor(elapsedMs / 1000)}s</span>}
           <span style={{ color: C.dim }}> · {a?.emoji} {a?.name}</span>
           {projectAgent ? (
-            <span style={{ ...mono, fontSize: 9, marginLeft: 6, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }} title={projectAgent.description}>
+            <span style={{ ...mono, fontSize: 10, marginLeft: 6, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }} title={projectAgent.description}>
               .claude:{projectAgent.id}
             </span>
           ) : (
-            <span style={{ ...mono, fontSize: 9, marginLeft: 6, color: C.warn }} title="No project agent — falls back to standard role">
+            <span style={{ ...mono, fontSize: 10, marginLeft: 6, color: C.warn }} title="No project agent — falls back to standard role">
               ⚠ no project agent
             </span>
           )}
           {t.modelOverride && (
-            <span style={{ ...mono, fontSize: 9, marginLeft: 6, color: C.accent }} title="Model overridden for this task">override</span>
+            <span style={{ ...mono, fontSize: 10, marginLeft: 6, color: C.accent }} title="Model overridden for this task">override</span>
           )}
         </span>
         <select
@@ -191,9 +191,9 @@ const TaskRow: React.FC<{
         )}
       </div>
       {taskExpand[t.id] && (taskLogs[t.id] || isBusy) && (
-        <div style={{ borderTop: `1px dashed ${C.dim}`, background: "#0a0e1a", color: "#9be59b", padding: 8, ...mono, fontSize: 10, maxHeight: 260, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+        <div style={{ borderTop: `1px dashed ${C.dim}`, background: C.terminal, color: C.termOk, padding: 8, ...mono, fontSize: 10, maxHeight: 260, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
           {taskLogs[t.id] || (isBusy ? "(waiting for output…)" : "(no output)")}
-          {isBusy && <div style={{ color: "#e8c46c", marginTop: 4 }}>⟳ still running…</div>}
+          {isBusy && <div style={{ color: C.termWarn, marginTop: 4 }}>⟳ still running…</div>}
         </div>
       )}
     </div>
@@ -220,8 +220,22 @@ export const EpicCard = (props: EpicCardProps) => {
             {p.done}/{p.total} subtasks complete
           </div>
         </div>
-        <div style={{ width: 100, height: 6, background: C.soft, position: "relative" }}>
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${p.total ? (p.done / p.total) * 100 : 0}%`, background: p.complete ? C.ok : C.accent, transition: "width 300ms" }} />
+        <div style={{ width: 100, height: 6, background: C.soft, position: "relative", overflow: "hidden" }}>
+          <div
+            aria-valuenow={p.total ? Math.round((p.done / p.total) * 100) : 0}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            role="progressbar"
+            style={{
+              position: "absolute",
+              inset: 0,
+              transformOrigin: "left center",
+              transform: `scaleX(${p.total ? p.done / p.total : 0})`,
+              background: p.complete ? C.ok : C.accent,
+              transition: "transform 300ms ease-out",
+              willChange: "transform",
+            }}
+          />
         </div>
         {epicBusy ? (
           <Btn small onClick={props.onStopEpic}><Pause size={10} /> stop</Btn>

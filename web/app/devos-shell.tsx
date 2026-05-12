@@ -838,14 +838,14 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
         </div>
       </div>
 
-      <div style={{ border: `1px solid ${C.line}`, background: "#0a0e1a", color: "#9be59b", padding: 10, marginBottom: 16, minHeight: 120, maxHeight: 200, overflowY: "auto", ...mono, fontSize: 11 }}>
+      <div style={{ border: `1px solid ${C.line}`, background: C.terminal, color: C.termOk, padding: 10, marginBottom: 16, minHeight: 120, maxHeight: 200, overflowY: "auto", ...mono, fontSize: 11 }}>
         <div style={{ color: "#666", marginBottom: 4 }}># terminal · multi-model session</div>
         {terminal.length === 0 ? (
           <div style={{ color: "#666" }}>$ _ press run to execute</div>
         ) : (
           terminal.map((l, i) => (
             <div key={i} style={{
-              color: l.kind === "cmd" ? "#9be59b" : l.kind === "ok" ? "#9be59b" : l.kind === "warn" ? "#e8c46c" : l.kind === "boot" ? "#9bc7e5" : "#ccc",
+              color: l.kind === "cmd" ? C.termOk : l.kind === "ok" ? C.termOk : l.kind === "warn" ? C.termWarn : l.kind === "boot" ? "#9bc7e5" : "#ccc",
               lineHeight: 1.5, whiteSpace: "pre-wrap",
             }}>{l.text}</div>
           ))

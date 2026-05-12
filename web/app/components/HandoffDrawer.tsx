@@ -54,12 +54,12 @@ const STATUS_COLOR: Record<string, string> = {
 
 const DiffLine = ({ line }: { line: string }) => {
   const first = line[0] || "";
-  let color = "#d6e2c7";
+  let color: string = C.termText;
   let bg = "transparent";
   if (line.startsWith("+++") || line.startsWith("---")) color = "#c0c8b8";
   else if (line.startsWith("@@")) { color = "#7aa3c5"; bg = "#0e1830"; }
-  else if (first === "+") { color = "#9be59b"; bg = "rgba(58,122,58,0.18)"; }
-  else if (first === "-") { color = "#ff8b6b"; bg = "rgba(193,74,60,0.18)"; }
+  else if (first === "+") { color = C.termOk; bg = "rgba(58,122,58,0.18)"; }
+  else if (first === "-") { color = C.termErr; bg = "rgba(193,74,60,0.18)"; }
   return (
     <div style={{ color, background: bg, padding: "0 6px", whiteSpace: "pre" }}>
       {line || " "}
@@ -134,7 +134,7 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
               {f.truncated && <span style={{ color: C.warn, fontSize: 10 }}>truncated</span>}
             </button>
             {expanded && (
-              <div style={{ background: "#0a0e1a", color: "#d6e2c7", ...mono, fontSize: 10.5, lineHeight: 1.45, padding: "6px 0", maxHeight: 480, overflow: "auto" }}>
+              <div style={{ background: C.terminal, color: C.termText, ...mono, fontSize: 10.5, lineHeight: 1.45, padding: "6px 0", maxHeight: 480, overflow: "auto" }}>
                 {f.diff.split("\n").map((line, i) => <DiffLine key={i} line={line} />)}
               </div>
             )}
@@ -251,11 +251,11 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
                   <strong> Changes </strong> tab to see what files actually changed during this run.
                 </div>
               )}
-              <div style={{ padding: 14, background: "#0a0e1a", color: "#d6e2c7", ...mono, fontSize: 11, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "100%" }}>
+              <div style={{ padding: 14, background: C.terminal, color: C.termText, ...mono, fontSize: 11, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "100%" }}>
                 {vm.loading
                   ? "loading…"
                   : vm.error
-                    ? <span style={{ color: "#ff8b6b" }}>error: {vm.error}</span>
+                    ? <span style={{ color: C.termErr }}>error: {vm.error}</span>
                     : (vm.content || "(empty file)")}
               </div>
             </>

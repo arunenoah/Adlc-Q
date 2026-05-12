@@ -17,7 +17,12 @@ export type RunResult =
   | { ok: false; error: string };
 
 export type SseEvent = "stdout" | "stderr" | "start" | "done" | "error";
-export type SseHandler = (event: SseEvent, payload: any) => void;
+export type SsePayload =
+  | string                                                         // stdout/stderr chunk
+  | { command?: string; modelId?: string; cwd?: string }           // start
+  | { exitCode?: number | null; durationMs?: number; error?: string } // done
+  | { error?: string };                                            // error
+export type SseHandler = (event: SseEvent, payload: SsePayload) => void;
 
 // Streams stdout/stderr from /api/run-task back via the onEvent callback,
 // while also accumulating the full transcript for the final RunResult.
