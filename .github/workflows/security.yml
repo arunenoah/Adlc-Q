@@ -1,0 +1,35 @@
+name: Security Review (Claude)
+
+# Anthropic AI-powered security review on every PR.
+# Reads CLAUDE_API_KEY from repo secrets — set via:
+#   gh secret set CLAUDE_API_KEY --body "<key>" --repo arunenoah/Adlc-Q
+# Repo is public, so external PRs require maintainer approval (set in
+# Settings → Actions → "Require approval for all external contributors").
+
+permissions:
+  pull-requests: write   # post inline comments
+  contents: read
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:     # manual run from the Actions tab
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+
+      - uses: anthropics/claude-code-security-review@main
+        with:
+          comment-pr: true
+          upload-results: true
+          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
+          claude-model: claude-opus-4-7
+          claudecode-timeout: 25
+          exclude-directories: web/.next,web/node_modules,web/public,old,files
