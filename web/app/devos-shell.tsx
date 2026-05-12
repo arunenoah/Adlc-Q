@@ -15,7 +15,10 @@ import { MODELS, findModelVariant, variantActive, migrateAgentModels } from "@/l
 import { AGENTS, STAGES, SUBTASK_TEMPLATES, defaultAgentModels } from "@/lib/agents";
 import { STDOUT_MANDATE, ROLE_PROMPTS, ROLE_PROMPTS_DRIFT } from "@/lib/prompts";
 import { Btn, Tag } from "./components/ui";
-import { ChangesTab } from "./components/HandoffDrawer";
+import { HandoffDrawer } from "./components/HandoffDrawer";
+import { EpicCard } from "./components/EpicCard";
+import { SplitModal } from "./components/SplitModal";
+import { KanbanBoard } from "./components/KanbanBoard";
 import { EpicReviewModal } from "./components/EpicReviewModal";
 import { EpicGraphImpact } from "./components/EpicGraphImpact";
 import { ProjectClaudeAssets } from "./components/ProjectClaudeAssets";
@@ -26,23 +29,11 @@ import { CLIsTab } from "./components/CLIsTab";
 import { NewProjectWizard } from "./components/NewProjectWizard";
 import { ImportFromWorkspace } from "./components/ImportFromWorkspace";
 import { stackFromLabel } from "@/lib/stack";
+import { runViaSse, parseWriterParallelTasks } from "@/lib/runner";
+import { useConnectedCLIs } from "@/lib/hooks/useConnectedCLIs";
 
 // ---------- CLIs (terminal models) with variants ----------
 
-
-
-// ---------- Connected CLIs state — seeded from server, persisted via Server Action ----------
-const useConnectedCLIs = (initial) => {
-  const [clis, setClis] = useState(initial);
-  const toggle = (id) => {
-    setClis((s) => ({
-      ...s,
-      [id]: s[id]?.active ? { active: false } : { active: true, plan: "Pro", until: "Dec 2026" },
-    }));
-    void toggleCLIAction(id);
-  };
-  return [clis, toggle];
-};
 
 
 
@@ -350,55 +341,6 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
     return lines.join("\n");
   };
 
-  const runViaSse = async (input, onEvent) => {
-    let stdout = "";
-    let stderr = "";
-    let exitCode = null;
-    let errorMsg = null;
-    let durationMs = 0;
-    try {
-      const resp = await fetch("/api/run-task", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      if (!resp.ok || !resp.body) {
-        return { ok: false, error: `HTTP ${resp.status}` };
-      }
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        let idx;
-        while ((idx = buf.indexOf("\n\n")) !== -1) {
-          const block = buf.slice(0, idx);
-          buf = buf.slice(idx + 2);
-          let event = "message";
-          let data = "";
-          for (const line of block.split("\n")) {
-            if (line.startsWith("event:")) event = line.slice(6).trim();
-            else if (line.startsWith("data:")) data += line.slice(5).trim();
-          }
-          if (!data) continue;
-          let payload;
-          try { payload = JSON.parse(data); } catch { continue; }
-          if (event === "stdout") { stdout += payload.chunk; onEvent("stdout", payload.chunk); }
-          else if (event === "stderr") { stderr += payload.chunk; onEvent("stderr", payload.chunk); }
-          else if (event === "start") onEvent("start", payload);
-          else if (event === "done") { exitCode = payload.exitCode; durationMs = payload.durationMs || 0; if (payload.error) errorMsg = payload.error; }
-          else if (event === "error") errorMsg = payload.error;
-        }
-      }
-    } catch (e) {
-      return { ok: false, error: e?.message || String(e) };
-    }
-    if (errorMsg && exitCode !== 0) return { ok: false, error: errorMsg };
-    return { ok: true, data: { stdout, stderr, exitCode, durationMs, command: `${input.cliCmd} ${input.modelId}` } };
-  };
-
   const executeTask = async (t, opts = {}) => {
     const epic = project.epics.find((e) => e.id === t.parentId);
     const agent = AGENTS.find((a) => a.id === t.agent);
@@ -495,39 +437,6 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
       }
     }
     return { ok: true, stdout: res.data.stdout || "" };
-  };
-
-  const parseWriterParallelTasks = (writerOutput) => {
-    if (!writerOutput) return null;
-    const fenceMatch = writerOutput.match(/```(?:json)?\s*([\s\S]*?)```/);
-    const candidates = [];
-    if (fenceMatch) candidates.push(fenceMatch[1]);
-    const arrMatch = writerOutput.match(/\[\s*\{[\s\S]*?\}\s*\]/);
-    if (arrMatch) candidates.push(arrMatch[0]);
-    for (const txt of candidates) {
-      try {
-        const parsed = JSON.parse(txt);
-        if (Array.isArray(parsed) && parsed.every((x) => x && x.id && x.title && x.role)) {
-          return parsed.map((p, i) => ({
-            id: String(p.id),
-            title: String(p.title),
-            role: String(p.role),
-            files: Array.isArray(p.files) ? p.files.map(String) : [],
-            depends_on: Array.isArray(p.depends_on) ? p.depends_on.map(String) : [],
-          }));
-        }
-        if (parsed && Array.isArray(parsed.parallel_subtasks)) {
-          return parsed.parallel_subtasks.map((p, i) => ({
-            id: String(p.id || `t${i}`),
-            title: String(p.title || ""),
-            role: String(p.role || "be"),
-            files: Array.isArray(p.files) ? p.files.map(String) : [],
-            depends_on: Array.isArray(p.depends_on) ? p.depends_on.map(String) : [],
-          }));
-        }
-      } catch {}
-    }
-    return null;
   };
 
   const runOne = async () => {
@@ -839,127 +748,24 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
       )}
 
       {handoffViewer && (
-        <>
-          <div onClick={closeHandoffViewer}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.25)", zIndex: 250 }} />
-          <aside style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 760, maxWidth: "92vw", background: C.paper, borderLeft: `1px solid ${C.line}`, boxShadow: "-4px 0 16px rgba(0,0,0,0.18)", zIndex: 260, display: "flex", flexDirection: "column" }}>
-            {/* Header */}
-            <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim }}>
-                  handoff{handoffViewer.taskTitle ? ` · ${handoffViewer.taskTitle}` : ""}
-                </div>
-                <div style={{ ...mono, fontSize: 11, fontWeight: 600, wordBreak: "break-all" }}>{handoffViewer.path}</div>
-                {!handoffViewer.loading && !handoffViewer.error && (
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 2 }}>
-                    {(handoffViewer.sizeBytes / 1024).toFixed(1)} kB · modified {new Date(handoffViewer.mtime).toLocaleString()}
-                    {handoffViewer.sinceISO && <> · task started {new Date(handoffViewer.sinceISO).toLocaleString()}</>}
-                  </div>
-                )}
-              </div>
-              <button onClick={closeHandoffViewer} title="close" style={{ ...mono, fontSize: 12, padding: "4px 8px", border: `1px solid ${C.line}`, background: C.paper, cursor: "pointer", display: "flex", alignItems: "center" }}>
-                <X size={12} />
-              </button>
-            </div>
-
-            {/* Tabs */}
-            <div style={{ display: "flex", borderBottom: `1px solid ${C.line}`, background: C.soft }}>
-              {[
-                { id: "handoff", label: "Handoff" },
-                { id: "changes", label: handoffViewer.changes
-                    ? `Changes (${handoffViewer.changes.files.length} files · +${handoffViewer.changes.totalAdditions} -${handoffViewer.changes.totalDeletions})`
-                    : "Changes" },
-              ].map((t) => (
-                <button key={t.id} onClick={() => switchHandoffTab(t.id)}
-                  style={{
-                    ...mono, fontSize: 11,
-                    padding: "8px 14px",
-                    border: "none",
-                    borderBottom: handoffViewer.tab === t.id ? `2px solid ${C.ink}` : "2px solid transparent",
-                    background: handoffViewer.tab === t.id ? C.paper : "transparent",
-                    color: handoffViewer.tab === t.id ? C.ink : C.dim,
-                    cursor: "pointer",
-                    fontWeight: handoffViewer.tab === t.id ? 600 : 400,
-                  }}>
-                  {t.label}
-                </button>
-              ))}
-              <div style={{ flex: 1 }} />
-              {handoffViewer.tab === "handoff" && (
-                <>
-                  <button onClick={() => navigator.clipboard?.writeText(handoffViewer.content || "")}
-                    disabled={handoffViewer.loading || !!handoffViewer.error}
-                    title="copy file content"
-                    style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}` }}>
-                    copy
-                  </button>
-                  <button onClick={() => openHandoffViewer(handoffViewer.path, { taskTitle: handoffViewer.taskTitle, sinceISO: handoffViewer.sinceISO })}
-                    title="reload" style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}>
-                    <RotateCcw size={11} />
-                  </button>
-                </>
-              )}
-              {handoffViewer.tab === "changes" && (
-                <button onClick={loadChangesTab} disabled={handoffViewer.changesLoading}
-                  title="reload diff" style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}>
-                  <RotateCcw size={11} />
-                </button>
-              )}
-            </div>
-
-            {/* Body */}
-            <div style={{ flex: 1, overflow: "auto" }}>
-              {handoffViewer.tab === "handoff" && (
-                <>
-                  {!handoffViewer.loading && !handoffViewer.error && handoffViewer.sizeBytes < 200 && (
-                    <div style={{ padding: "10px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 10, color: "#5a3e00" }}>
-                      ⚠ Handoff body is empty (file = header only). The agent likely wrote
-                      its result to a skill-managed file instead of stdout. Open the
-                      <strong> Changes </strong> tab to see what files actually changed during this run.
-                    </div>
-                  )}
-                  <div style={{ padding: 14, background: "#0a0e1a", color: "#d6e2c7", ...mono, fontSize: 11, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "100%" }}>
-                    {handoffViewer.loading
-                      ? "loading…"
-                      : handoffViewer.error
-                        ? <span style={{ color: "#ff8b6b" }}>error: {handoffViewer.error}</span>
-                        : (handoffViewer.content || "(empty file)")}
-                  </div>
-                </>
-              )}
-              {handoffViewer.tab === "changes" && (
-                <ChangesTab vm={handoffViewer} setVm={setHandoffViewer} />
-              )}
-            </div>
-          </aside>
-        </>
+        <HandoffDrawer
+          vm={handoffViewer}
+          setVm={setHandoffViewer}
+          onClose={closeHandoffViewer}
+          onSwitchTab={switchHandoffTab}
+          onReloadHandoff={() => openHandoffViewer(handoffViewer.path, { taskTitle: handoffViewer.taskTitle, sinceISO: handoffViewer.sinceISO })}
+          onReloadChanges={loadChangesTab}
+        />
       )}
 
       {splitModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
-          onClick={(e) => { if (!splitModal.busy && e.target === e.currentTarget) setSplitModal(null); }}>
-          <div style={{ background: C.paper, border: `1px solid ${C.line}`, padding: 18, width: 600, maxWidth: "92vw" }}>
-            <div style={{ ...serif, fontSize: 16, fontWeight: 600, marginBottom: 10 }}>Split spec into parallel subtasks</div>
-            <div style={{ ...mono, fontSize: 10, color: C.dim, marginBottom: 12 }}>
-              Reads spec from a file in <code>{project.workspacePath}</code>, asks the writer model to emit ONLY a <code>parallel_subtasks</code> JSON block, parses it, and replaces the static impl rows with one row per parallel task.
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>spec file (relative or absolute)</div>
-              <input value={splitModal.specPath} onChange={(e) => setSplitModal((m) => ({ ...m, specPath: e.target.value }))}
-                disabled={splitModal.busy}
-                style={{ ...mono, fontSize: 11, padding: 8, width: "100%", border: `1px solid ${C.line}`, background: C.paper }} />
-            </div>
-            {splitModal.error && (
-              <pre style={{ ...mono, fontSize: 10, color: C.accent, background: "#fff5f3", border: `1px solid ${C.accent}`, padding: 8, marginBottom: 10, whiteSpace: "pre-wrap", maxHeight: 200, overflow: "auto" }}>{splitModal.error}</pre>
-            )}
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
-              <Btn onClick={() => setSplitModal(null)} disabled={splitModal.busy}>cancel</Btn>
-              <Btn primary onClick={runSplit} disabled={splitModal.busy || !splitModal.specPath.trim()}>
-                {splitModal.busy ? "splitting…" : <>✂ split now</>}
-              </Btn>
-            </div>
-          </div>
-        </div>
+        <SplitModal
+          state={splitModal}
+          workspacePath={project.workspacePath}
+          onChangeSpecPath={(p) => setSplitModal((m) => ({ ...m, specPath: p }))}
+          onCancel={() => setSplitModal(null)}
+          onRun={runSplit}
+        />
       )}
 
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
@@ -1050,218 +856,48 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
 
       <div style={{ marginBottom: 16 }}>
         <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8 }}>epics</div>
-        {project.epics.map((epic) => {
-          const p = epicProgress(epic.id);
-          const collapsed = collapsedEpics[epic.id];
-          const epicBusy = !!epicRunning[epic.id];
-          return (
-            <div key={epic.id} style={{ border: `1px solid ${C.line}`, marginBottom: 6, background: C.paper }}>
-              <div style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: 10 }}>
-                <button onClick={() => setCollapsedEpics({ ...collapsedEpics, [epic.id]: !collapsed })}
-                  style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
-                  {collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
-                </button>
-                <div style={{ flex: 1, cursor: "pointer" }} onClick={() => setCollapsedEpics({ ...collapsedEpics, [epic.id]: !collapsed })}>
-                  <div style={{ ...serif, fontSize: 15 }}>
-                    {epic.title} {p.complete && <Check size={14} style={{ display: "inline", color: C.ok, verticalAlign: "middle" }} />}
-                  </div>
-                  <div style={{ ...mono, fontSize: 10, color: C.dim, marginTop: 2 }}>
-                    {p.done}/{p.total} subtasks complete
-                  </div>
-                </div>
-                <div style={{ width: 100, height: 6, background: C.soft, position: "relative" }}>
-                  <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${p.total ? (p.done / p.total) * 100 : 0}%`, background: p.complete ? C.ok : C.accent, transition: "width 300ms" }} />
-                </div>
-                {epicBusy ? (
-                  <Btn small onClick={() => stopEpic(epic.id)}><Pause size={10} /> stop</Btn>
-                ) : !p.manualComplete ? (
-                  <Btn small primary onClick={() => runEpic(epic.id)} disabled={!project.workspacePath}>
-                    <Play size={10} /> {p.done > 0 && p.done < p.total ? "resume" : "run epic"}
-                  </Btn>
-                ) : null}
-                {!p.manualComplete && !epicBusy && (
-                  <Btn small onClick={() => markEpicComplete(epic.id)} title="Mark this epic as complete (overrides subtask stages)">
-                    <Check size={10} /> mark complete
-                  </Btn>
-                )}
-                {p.manualComplete && (
-                  <Btn small onClick={() => reopenEpic(epic.id)} title={`Completed ${new Date(p.completedAt).toLocaleString()}${p.completedNote ? ` — ${p.completedNote}` : ""}. Click to reopen.`}>
-                    <RotateCcw size={10} /> reopen
-                  </Btn>
-                )}
-                {p.manualComplete && (
-                  <Tag color={C.ok} title={p.completedNote || ""}>
-                    ✓ done {new Date(p.completedAt).toLocaleDateString()}
-                  </Tag>
-                )}
-                {p.complete && !p.manualComplete && <Tag color={C.ok}>done</Tag>}
-              </div>
-              {!collapsed && (
-                <div style={{ borderTop: `1px dashed ${C.dim}`, padding: 8, display: "flex", flexDirection: "column", gap: 3 }}>
-                  {epic.brief && (
-                    <div style={{ ...mono, fontSize: 11, color: C.dim, padding: "4px 8px", marginBottom: 4 }}>{epic.brief}</div>
-                  )}
-                  {epic.graphImpact && <EpicGraphImpact impact={epic.graphImpact} />}
-                  {tasks.filter((t) => t.parentId === epic.id).map((t) => {
-                    const a = agentById(t.agent);
-                    const variantId = taskVariantId(t);
-                    const found = findModelVariant(variantId);
-                    const projectAgent = (project.agents || []).find((pa) => pa.role === t.agent);
-                    const cliInstalled = found ? cliAvail[found.model.cmd] : false;
-                    const isBusy = !!taskBusy[t.id];
-                    const isDone = t.stage === "done";
-                    const gated = isTaskGated(t);
-                    const elapsedMs = isBusy && taskStart[t.id] ? Date.now() - taskStart[t.id] : 0;
-                    const showLockIcon = gated && !isDone && !isBusy;
-                    return (
-                      <div key={t.id} id={`task-row-${t.id}`}>
-                      <div style={{ ...mono, fontSize: 11, padding: "4px 8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, borderTop: `1px solid ${C.soft}`, opacity: gated && !isDone ? 0.55 : 1 }}>
-                        <span style={{ color: isDone ? C.ok : C.ink, flex: 1, minWidth: 0 }}>
-                          {isBusy ? "⟳" : isDone ? "✓" : showLockIcon ? <Lock size={9} style={{ display: "inline", verticalAlign: "middle" }} /> : "○"} {t.title}
-                          {isBusy && <span style={{ color: C.accent, marginLeft: 4 }}>· running {Math.floor(elapsedMs / 1000)}s</span>}
-                          <span style={{ color: C.dim }}> · {a?.emoji} {a?.name}</span>
-                          {projectAgent ? (
-                            <span style={{ ...mono, fontSize: 9, marginLeft: 6, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }} title={projectAgent.description}>
-                              .claude:{projectAgent.id}
-                            </span>
-                          ) : (
-                            <span style={{ ...mono, fontSize: 9, marginLeft: 6, color: C.warn }} title="No project agent — falls back to standard role">
-                              ⚠ no project agent
-                            </span>
-                          )}
-                          {t.modelOverride && (
-                            <span style={{ ...mono, fontSize: 9, marginLeft: 6, color: C.accent }} title="Model overridden for this task">override</span>
-                          )}
-                        </span>
-                        <select
-                          value={variantId || ""}
-                          onChange={(e) => setTaskOverride(t.id, e.target.value)}
-                          disabled={isBusy}
-                          style={{ ...mono, fontSize: 10, padding: "2px 4px", border: `1px solid ${C.line}`, background: C.paper, color: C.ink, maxWidth: 180 }}
-                          title="Override model for this task"
-                        >
-                          {MODELS.flatMap((m) =>
-                            m.variants.map((v) => {
-                              const installed = cliAvail[m.cmd];
-                              return (
-                                <option key={v.id} value={v.id}>
-                                  {m.name} · {v.name}{installed === false ? " (not installed)" : ""}
-                                </option>
-                              );
-                            }),
-                          )}
-                        </select>
-                        {isDone ? (
-                          <button onClick={() => resetTask(t.id)} disabled={isBusy}
-                            title="Reset to backlog"
-                            style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${C.line}`, background: C.paper, cursor: "pointer" }}>
-                            <RotateCcw size={10} />
-                          </button>
-                        ) : null}
-                        <button onClick={() => runOneTask(t.id)} disabled={isBusy || !project.workspacePath || cliInstalled === false || (gated && !isDone)}
-                          title={gated && !isDone ? "Locked — complete scope + spec first" : cliInstalled === false ? `${found?.model.cmd} not on PATH` : isDone ? "Re-run this task" : "Run this task"}
-                          style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${(gated && !isDone) ? C.dim : cliInstalled === false ? C.warn : C.ink}`, background: (gated && !isDone) ? C.soft : cliInstalled === false ? C.soft : C.ink, color: (gated && !isDone) || cliInstalled === false ? C.dim : C.paper, cursor: ((gated && !isDone) || cliInstalled === false) ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 3 }}>
-                          {isBusy ? "⟳" : (gated && !isDone) ? <Lock size={9} /> : <Play size={9} />} {isDone ? "rerun" : (gated && !isDone) ? "locked" : "run"}
-                        </button>
-                        <Tag color={stageColor(t.stage)}>{STAGES.find((s) => s.id === t.stage)?.label}</Tag>
-                        {epic?.handoffPaths?.[t.key] && (
-                          <button
-                            type="button"
-                            onClick={(ev) => {
-                              ev.stopPropagation();
-                              const startMs = taskStart[t.id];
-                              openHandoffViewer(epic.handoffPaths[t.key], {
-                                taskTitle: t.title,
-                                sinceISO: startMs ? new Date(startMs).toISOString() : null,
-                              });
-                            }}
-                            title={`Open ${epic.handoffPaths[t.key]}`}
-                            style={{ ...mono, fontSize: 9, color: C.swarm, background: "transparent", border: `1px dashed ${C.swarm}`, padding: "2px 5px", cursor: "pointer", borderRadius: 2 }}>
-                            📄 {epic.handoffPaths[t.key].split("/").slice(-2).join("/")}
-                          </button>
-                        )}
-                        {t.key === "spec" && isDone && (
-                          <button onClick={() => openSplitModal(epic)}
-                            title="Break spec into parallel implementation subtasks"
-                            style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${C.swarm}`, background: C.paper, color: C.swarm, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
-                            ✂ split
-                          </button>
-                        )}
-                        {(taskLogs[t.id] || isBusy) && (
-                          <button onClick={() => setTaskExpand((m) => ({ ...m, [t.id]: !m[t.id] }))}
-                            title={taskExpand[t.id] ? "hide live output" : "show live output"}
-                            style={{ background: "transparent", border: `1px solid ${C.line}`, padding: "2px 4px", cursor: "pointer", display: "flex" }}>
-                            {taskExpand[t.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                          </button>
-                        )}
-                      </div>
-                      {taskExpand[t.id] && (taskLogs[t.id] || isBusy) && (
-                        <div style={{ borderTop: `1px dashed ${C.dim}`, background: "#0a0e1a", color: "#9be59b", padding: 8, ...mono, fontSize: 10, maxHeight: 260, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                          {taskLogs[t.id] || (isBusy ? "(waiting for output…)" : "(no output)")}
-                          {isBusy && <div style={{ color: "#e8c46c", marginTop: 4 }}>⟳ still running…</div>}
-                        </div>
-                      )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8 }}>
-        <Layers size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
-        stages
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${STAGES.length}, 1fr)`, gap: 6, overflowX: "auto" }}>
-        {STAGES.map((stage) => (
-          <div key={stage.id} style={{ border: `1px solid ${C.line}`, background: C.paper, minHeight: 200 }}>
-            <div style={{ padding: "8px 10px", borderBottom: `1px solid ${C.line}`, background: stageColor(stage.id), color: C.paper, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase" }}>{stage.label}</span>
-              <span style={{ ...mono, fontSize: 9 }}>{byStage[stage.id].length}</span>
-            </div>
-            <div style={{ padding: 6, display: "flex", flexDirection: "column", gap: 4 }}>
-              {byStage[stage.id].map((t) => {
-                const a = agentById(t.agent);
-                const variantId = taskVariantId(t);
-                const found = findModelVariant(variantId);
-                const isBusy = !!taskBusy[t.id];
-                const hasLogs = !!taskLogs[t.id];
-                const elapsedMs = isBusy && taskStart[t.id] ? Date.now() - taskStart[t.id] : 0;
-                const onClick = () => {
-                  if (!hasLogs && !isBusy) return;
-                  setTaskExpand((m) => ({ ...m, [t.id]: !m[t.id] }));
-                  document.getElementById(`task-row-${t.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                };
-                return (
-                  <div key={t.id} onClick={onClick} title={hasLogs || isBusy ? "click to view live output" : undefined}
-                    style={{ border: `1px solid ${isBusy ? C.accent : C.line}`, padding: 6, background: isBusy ? "#fff8f4" : "#fff", cursor: hasLogs || isBusy ? "pointer" : "default" }}>
-                    <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 2 }}>{t.parentTitle}</div>
-                    <div style={{ ...mono, fontSize: 11, lineHeight: 1.3 }}>
-                      {isBusy ? "⟳ " : ""}{t.title}
-                      {isBusy && <span style={{ color: C.accent, marginLeft: 4 }}>{Math.floor(elapsedMs / 1000)}s</span>}
-                    </div>
-                    <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
-                      <span>{a?.emoji} {a?.name}</span>
-                      {hasLogs && <span style={{ color: C.swarm }}>· log ↗</span>}
-                    </div>
-                    {found && (
-                      <div style={{ ...mono, fontSize: 8, color: C.paper, background: found.model.color, padding: "1px 4px", marginTop: 3, display: "inline-block" }}>
-                        {found.variant.name}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              {byStage[stage.id].length === 0 && (
-                <div style={{ ...mono, fontSize: 9, color: C.dim, padding: 10, textAlign: "center" }}>—</div>
-              )}
-            </div>
-          </div>
+        {project.epics.map((epic) => (
+          <EpicCard
+            key={epic.id}
+            epic={epic}
+            project={project}
+            tasks={tasks.filter((t) => t.parentId === epic.id)}
+            progress={epicProgress(epic.id)}
+            collapsed={!!collapsedEpics[epic.id]}
+            epicBusy={!!epicRunning[epic.id]}
+            cliAvail={cliAvail}
+            taskBusy={taskBusy}
+            taskStart={taskStart}
+            taskLogs={taskLogs}
+            taskExpand={taskExpand}
+            taskVariantId={taskVariantId}
+            isTaskGated={isTaskGated}
+            onToggleCollapsed={() => setCollapsedEpics({ ...collapsedEpics, [epic.id]: !collapsedEpics[epic.id] })}
+            onRunEpic={() => runEpic(epic.id)}
+            onStopEpic={() => stopEpic(epic.id)}
+            onMarkComplete={() => markEpicComplete(epic.id)}
+            onReopen={() => reopenEpic(epic.id)}
+            onSetTaskOverride={setTaskOverride}
+            onResetTask={resetTask}
+            onRunOneTask={runOneTask}
+            onOpenHandoff={openHandoffViewer}
+            onOpenSplitModal={openSplitModal}
+            onToggleExpand={(taskId) => setTaskExpand((m) => ({ ...m, [taskId]: !m[taskId] }))}
+          />
         ))}
       </div>
+
+      <KanbanBoard
+        byStage={byStage}
+        taskBusy={taskBusy}
+        taskStart={taskStart}
+        taskLogs={taskLogs}
+        taskVariantId={taskVariantId}
+        onOpenLog={(taskId) => {
+          setTaskExpand((m) => ({ ...m, [taskId]: !m[taskId] }));
+          document.getElementById(`task-row-${taskId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+      />
     </div>
   );
 };

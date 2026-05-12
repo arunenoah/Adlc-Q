@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, X, RotateCcw } from "lucide-react";
 import { C, mono } from "@/lib/theme";
 
-// Right-side handoff drawer building blocks.
+// Right-side handoff drawer.
 // SRP: pure presentation. The owning component (ProjectBoard) holds the
-// viewmodel + fetches data via server actions; this file renders only.
+// viewmodel + fetches data via server actions; this file renders only and
+// signals back via callbacks.
 
 export type ChangedFileVM = {
   path: string;
@@ -109,7 +110,7 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
         {vm.sinceISO && <> · filtered to files modified ≥ {new Date(vm.sinceISO).toLocaleTimeString()}</>}
         · totals: <span style={{ color: "#3a7a3a" }}>+{vm.changes.totalAdditions}</span> <span style={{ color: "#c14a3c" }}>-{vm.changes.totalDeletions}</span>
       </div>
-      {vm.changes.files.map((f) => {
+      {vm.changes!.files.map((f) => {
         const expanded = !!vm.expandedDiff?.[f.path];
         const statusKey = f.status in STATUS_LABEL ? f.status : "M";
         return (
@@ -141,5 +142,127 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
         );
       })}
     </div>
+  );
+};
+
+// ----- Drawer shell -----
+
+type DrawerProps = {
+  vm: HandoffViewerVM;
+  setVm: React.Dispatch<React.SetStateAction<HandoffViewerVM | null>>;
+  onClose: () => void;
+  onSwitchTab: (tab: "handoff" | "changes") => void;
+  onReloadHandoff: () => void;
+  onReloadChanges: () => void;
+};
+
+const TabBtn = ({ id, label, active, onClick }: { id: string; label: string; active: boolean; onClick: () => void }) => (
+  <button
+    key={id}
+    onClick={onClick}
+    style={{
+      ...mono,
+      fontSize: 11,
+      padding: "8px 14px",
+      border: "none",
+      borderBottom: active ? `2px solid ${C.ink}` : "2px solid transparent",
+      background: active ? C.paper : "transparent",
+      color: active ? C.ink : C.dim,
+      cursor: "pointer",
+      fontWeight: active ? 600 : 400,
+    }}
+  >
+    {label}
+  </button>
+);
+
+export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff, onReloadChanges }: DrawerProps) => {
+  const changesLabel = vm.changes
+    ? `Changes (${vm.changes.files.length} files · +${vm.changes.totalAdditions} -${vm.changes.totalDeletions})`
+    : "Changes";
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.25)", zIndex: 250 }} />
+      <aside style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 760, maxWidth: "92vw", background: C.paper, borderLeft: `1px solid ${C.line}`, boxShadow: "-4px 0 16px rgba(0,0,0,0.18)", zIndex: 260, display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", alignItems: "flex-start", gap: 10 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim }}>
+              handoff{vm.taskTitle ? ` · ${vm.taskTitle}` : ""}
+            </div>
+            <div style={{ ...mono, fontSize: 11, fontWeight: 600, wordBreak: "break-all" }}>{vm.path}</div>
+            {!vm.loading && !vm.error && (
+              <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 2 }}>
+                {(vm.sizeBytes / 1024).toFixed(1)} kB · modified {new Date(vm.mtime).toLocaleString()}
+                {vm.sinceISO && <> · task started {new Date(vm.sinceISO).toLocaleString()}</>}
+              </div>
+            )}
+          </div>
+          <button onClick={onClose} title="close" style={{ ...mono, fontSize: 12, padding: "4px 8px", border: `1px solid ${C.line}`, background: C.paper, cursor: "pointer", display: "flex", alignItems: "center" }}>
+            <X size={12} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", borderBottom: `1px solid ${C.line}`, background: C.soft }}>
+          <TabBtn id="handoff" label="Handoff"     active={vm.tab === "handoff"} onClick={() => onSwitchTab("handoff")} />
+          <TabBtn id="changes" label={changesLabel} active={vm.tab === "changes"} onClick={() => onSwitchTab("changes")} />
+          <div style={{ flex: 1 }} />
+          {vm.tab === "handoff" && (
+            <>
+              <button
+                onClick={() => navigator.clipboard?.writeText(vm.content || "")}
+                disabled={vm.loading || !!vm.error}
+                title="copy file content"
+                style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}` }}
+              >
+                copy
+              </button>
+              <button
+                onClick={onReloadHandoff}
+                title="reload"
+                style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
+              >
+                <RotateCcw size={11} />
+              </button>
+            </>
+          )}
+          {vm.tab === "changes" && (
+            <button
+              onClick={onReloadChanges}
+              disabled={vm.changesLoading}
+              title="reload diff"
+              style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
+            >
+              <RotateCcw size={11} />
+            </button>
+          )}
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflow: "auto" }}>
+          {vm.tab === "handoff" && (
+            <>
+              {!vm.loading && !vm.error && vm.sizeBytes < 200 && (
+                <div style={{ padding: "10px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 10, color: "#5a3e00" }}>
+                  ⚠ Handoff body is empty (file = header only). The agent likely wrote
+                  its result to a skill-managed file instead of stdout. Open the
+                  <strong> Changes </strong> tab to see what files actually changed during this run.
+                </div>
+              )}
+              <div style={{ padding: 14, background: "#0a0e1a", color: "#d6e2c7", ...mono, fontSize: 11, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "100%" }}>
+                {vm.loading
+                  ? "loading…"
+                  : vm.error
+                    ? <span style={{ color: "#ff8b6b" }}>error: {vm.error}</span>
+                    : (vm.content || "(empty file)")}
+              </div>
+            </>
+          )}
+          {vm.tab === "changes" && <ChangesTab vm={vm} setVm={setVm} />}
+        </div>
+      </aside>
+    </>
   );
 };
