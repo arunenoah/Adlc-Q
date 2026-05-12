@@ -194,13 +194,45 @@ function deriveAgentRole(id: string, fmRole: string): string | undefined {
   return undefined;
 }
 
-function autoMatchSkills(agentId: string, skills: SkillMeta[]): string[] {
+// Explicit role → skill ID-fragment mapping. Each fragment is matched
+// against skill IDs as substrings, in order; the first matching skill in the
+// project's skills/ folder wins (multiple matches all get linked).
+// Stack-aware fragments use {stack} which is resolved against the detected
+// project stack key (laravel|yii2|nextjs|react|node|flutter|php|generic).
+const EXPLICIT_ROLE_SKILLS: Record<string, string[]> = {
+  secpre: ["security-first", "security-audit"],
+  sec:    ["security-first", "security-audit"],
+  qa:     ["qa-testing", "qa-integration-testing", "playwright"],
+  rev:    ["code-reviewer-quality"],
+  lead:   ["tech-lead-architecture", "tech-lead-gates"],
+  writer: ["tech-writer-spec"],
+  be:     ["senior-engineer-{stack}", "senior-engineer-debugging"],
+  fe:     ["senior-engineer-{stack}", "senior-engineer-debugging"],
+  db:     ["senior-engineer-{stack}", "senior-engineer-debugging"],
+  dev:    ["senior-engineer-debugging"],
+  ux:     [],
+};
+
+function autoMatchSkills(agentId: string, skills: SkillMeta[], stackKey?: string): string[] {
+  const matches = new Set<string>();
+
+  // 1. Explicit role mapping (preferred). Resolves {stack} placeholder.
+  const explicit = EXPLICIT_ROLE_SKILLS[agentId.toLowerCase()];
+  if (explicit) {
+    for (const frag of explicit) {
+      const resolved = stackKey ? frag.replace("{stack}", stackKey) : frag;
+      const hit = skills.find((s) => s.id.toLowerCase().includes(resolved.toLowerCase()));
+      if (hit) matches.add(hit.id);
+    }
+    if (matches.size > 0) return [...matches];
+  }
+
+  // 2. Fallback — token-based fuzzy match against skill id + name.
   const tokens = agentId
     .toLowerCase()
     .split(/[-_\s]+/)
     .filter((t) => t.length > 2 && !["the", "and", "for"].includes(t));
   if (tokens.length === 0) return [];
-  const matches = new Set<string>();
   for (const s of skills) {
     const hay = `${s.id} ${s.name}`.toLowerCase();
     if (tokens.some((t) => hay.includes(t))) matches.add(s.id);
@@ -336,7 +368,21 @@ async function detectStackFromManifests(
   return fallbackLabel;
 }
 
-async function scanAgents(projectPath: string, skills: SkillMeta[]): Promise<AgentMeta[]> {
+function stackKeyFromLabel(label: string): string | undefined {
+  const l = (label || "").toLowerCase();
+  if (l.includes("yii")) return "yii2";
+  if (l.includes("laravel")) return "laravel";
+  if (l.includes("next")) return "nextjs";
+  if (l.includes("react native")) return "react-native";
+  if (l.includes("react")) return "react";
+  if (l.includes("vue")) return "vue";
+  if (l.includes("flutter") || l.includes("dart")) return "flutter";
+  if (l.includes("node") || l.includes("typescript")) return "node";
+  if (l.includes("php")) return "php";
+  return undefined;
+}
+
+async function scanAgents(projectPath: string, skills: SkillMeta[], stackKey?: string): Promise<AgentMeta[]> {
   const agentsDir = path.join(projectPath, ".claude", "agents");
   let entries: string[];
   try {
@@ -357,7 +403,7 @@ async function scanAgents(projectPath: string, skills: SkillMeta[]): Promise<Age
     const fm = parseFrontmatter(content);
     const id = entry.replace(/\.md$/, "");
     const explicitSkills = fmList(fm, "skills");
-    const skillIds = explicitSkills.length ? explicitSkills : autoMatchSkills(id, skills);
+    const skillIds = explicitSkills.length ? explicitSkills : autoMatchSkills(id, skills, stackKey);
     out.push({
       id,
       name: fmString(fm, "name") || id,
@@ -402,10 +448,11 @@ export async function scanWorkspace(): Promise<DiscoveredProject[]> {
     const graphMeta = parseGraphReport(report);
     const tableEntry = stackTable.get(dirName);
     const skills = await scanSkills(projectPath);
-    const [agents, commands, detectedLabel] = await Promise.all([
-      scanAgents(projectPath, skills),
+    const detectedLabel = await detectStackFromManifests(projectPath, tableEntry?.stackLabel || "Unknown");
+    const stackKey = stackKeyFromLabel(detectedLabel);
+    const [agents, commands] = await Promise.all([
+      scanAgents(projectPath, skills, stackKey),
       scanCommands(projectPath),
-      detectStackFromManifests(projectPath, tableEntry?.stackLabel || "Unknown"),
     ]);
     results.push({
       dirName,

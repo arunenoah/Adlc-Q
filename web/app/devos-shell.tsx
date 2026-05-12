@@ -1019,7 +1019,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
 
   const buildPrompt = (epic, task, agent, priorOutputs) => {
     const lines = [
-      "# DevOS subtask",
+      "# Adlc-Q subtask",
       `Project: ${project.name} (${project.stackLabel || "unknown stack"})`,
       `Epic: ${epic?.title || "(untitled)"} (type: ${epic?.type || "feature"})`,
     ];
@@ -1455,7 +1455,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
       addTerm({ kind: "warn", text: "✗ project has no workspacePath — import or set workspacePath first" });
       return;
     }
-    addTerm({ kind: "boot", text: "◉ DevOS booting · headless CLI runner" });
+    addTerm({ kind: "boot", text: "◉ Adlc-Q booting · headless CLI runner" });
     addTerm({ kind: "boot", text: `◉ workspace: ${project.workspacePath}` });
     assignedVariants.forEach((vid) => {
       const found = findModelVariant(vid);
@@ -1490,7 +1490,34 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
   const epicProgress = (epicId) => {
     const subsT = tasks.filter((t) => t.parentId === epicId);
     const done = subsT.filter((t) => t.stage === "done").length;
-    return { done, total: subsT.length, complete: done === subsT.length && subsT.length > 0 };
+    const epic = project.epics.find((e) => e.id === epicId);
+    const manualComplete = !!epic?.completedAt;
+    return {
+      done,
+      total: subsT.length,
+      complete: manualComplete || (done === subsT.length && subsT.length > 0),
+      manualComplete,
+      completedAt: epic?.completedAt,
+      completedNote: epic?.completedNote,
+    };
+  };
+
+  const markEpicComplete = (epicId) => {
+    const epic = project.epics.find((e) => e.id === epicId);
+    if (!epic) return;
+    const note = window.prompt(`Mark "${epic.title}" as complete?\n\nOptional note (e.g. "shipped in v1.2.0", "merged in PR #42"):`, "");
+    if (note === null) return; // user hit cancel
+    const stamp = new Date().toISOString();
+    persistEpicChange(epicId, (e) => ({ ...e, completedAt: stamp, completedNote: note || undefined }));
+    addTerm({ kind: "info", text: `✓ epic marked complete: ${epic.title}${note ? ` — ${note}` : ""}` });
+  };
+
+  const reopenEpic = (epicId) => {
+    const epic = project.epics.find((e) => e.id === epicId);
+    if (!epic) return;
+    if (!window.confirm(`Reopen "${epic.title}"? This clears the completed timestamp.`)) return;
+    persistEpicChange(epicId, (e) => { const { completedAt, completedNote, ...rest } = e; return rest; });
+    addTerm({ kind: "info", text: `↻ epic reopened: ${epic.title}` });
   };
 
   const techName = (cat, id) => TECH[cat].find((t) => t.id === id)?.name || id;
@@ -1769,12 +1796,27 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
                 </div>
                 {epicBusy ? (
                   <Btn small onClick={() => stopEpic(epic.id)}><Pause size={10} /> stop</Btn>
-                ) : (
+                ) : !p.manualComplete ? (
                   <Btn small primary onClick={() => runEpic(epic.id)} disabled={!project.workspacePath}>
                     <Play size={10} /> {p.done > 0 && p.done < p.total ? "resume" : "run epic"}
                   </Btn>
+                ) : null}
+                {!p.manualComplete && !epicBusy && (
+                  <Btn small onClick={() => markEpicComplete(epic.id)} title="Mark this epic as complete (overrides subtask stages)">
+                    <Check size={10} /> mark complete
+                  </Btn>
                 )}
-                {p.complete && <Tag color={C.ok}>done</Tag>}
+                {p.manualComplete && (
+                  <Btn small onClick={() => reopenEpic(epic.id)} title={`Completed ${new Date(p.completedAt).toLocaleString()}${p.completedNote ? ` — ${p.completedNote}` : ""}. Click to reopen.`}>
+                    <RotateCcw size={10} /> reopen
+                  </Btn>
+                )}
+                {p.manualComplete && (
+                  <Tag color={C.ok} title={p.completedNote || ""}>
+                    ✓ done {new Date(p.completedAt).toLocaleDateString()}
+                  </Tag>
+                )}
+                {p.complete && !p.manualComplete && <Tag color={C.ok}>done</Tag>}
               </div>
               {!collapsed && (
                 <div style={{ borderTop: `1px dashed ${C.dim}`, padding: 8, display: "flex", flexDirection: "column", gap: 3 }}>
@@ -1969,9 +2011,9 @@ const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
             onMouseEnter={(e) => e.currentTarget.style.transform = "translate(-2px,-2px)"}
             onMouseLeave={(e) => e.currentTarget.style.transform = "translate(0,0)"}>
             <button
-              onClick={(e) => { e.stopPropagation(); if (window.confirm(`Remove "${p.name}" from DevOS?`)) onDelete(p.id); }}
+              onClick={(e) => { e.stopPropagation(); if (window.confirm(`Remove "${p.name}" from Adlc-Q?`)) onDelete(p.id); }}
               style={{ position: "absolute", top: 8, right: 8, background: "transparent", border: "none", cursor: "pointer", color: C.dim, padding: 4 }}
-              title="remove from DevOS">
+              title="remove from Adlc-Q">
               <X size={11} />
             </button>
             <div onClick={() => onOpen(p)} style={{ cursor: "pointer" }}>
@@ -2500,7 +2542,7 @@ const ImportFromWorkspace = ({ projects, importedPaths, onImport, onOpen }) => {
             Discoverable from Workspace
           </div>
           <div style={{ ...mono, fontSize: 11, color: C.dim }}>
-            {projects.length} project{projects.length === 1 ? "" : "s"} with graphify metadata · click import to bring under DevOS management
+            {projects.length} project{projects.length === 1 ? "" : "s"} with graphify metadata · click import to bring under Adlc-Q management
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, border: `1px solid ${C.line}`, padding: "4px 8px", background: C.paper }}>
@@ -2686,7 +2728,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
           <div style={{ width: 22, height: 22, border: `2px solid ${C.ink}`, position: "relative" }}>
             <div style={{ position: "absolute", inset: 3, background: C.accent }} />
           </div>
-          <div style={{ ...serif, fontSize: 18, fontWeight: 600 }}>DevOS</div>
+          <div style={{ ...serif, fontSize: 18, fontWeight: 600 }}>Adlc-Q</div>
           <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.14em" }}>v0.7 · BYO-CLI</div>
         </div>
       </div>
@@ -2728,7 +2770,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
         {tab === "clis" && (
           <>
             <div style={{ ...serif, fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 4 }}>Connected CLIs</div>
-            <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 20 }}>your installed terminal models · DevOS shells out to whichever you connect · auth stays with the CLI</div>
+            <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 20 }}>your installed terminal models · Adlc-Q shells out to whichever you connect · auth stays with the CLI</div>
             <CLIsTab clis={clis} onToggle={toggleCLI} />
           </>
         )}

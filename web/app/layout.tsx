@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevOS",
-  description: "An SDLC workspace for the CLIs you already use.",
+  title: "Adlc-Q",
+  description: "Agentic SDLC + Quality — orchestrator for the CLIs you already use.",
 };
 
 export default function RootLayout({

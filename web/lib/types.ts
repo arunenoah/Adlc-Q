@@ -21,6 +21,8 @@ export type Epic = {
   outputs?: Record<string, string>;
   taskStages?: Record<string, string>;
   handoffPaths?: Record<string, string>;
+  completedAt?: string;       // ISO timestamp when user manually marked complete
+  completedNote?: string;     // optional context (PR #, version, etc.)
 };
 
 export type DynamicImplTask = {
