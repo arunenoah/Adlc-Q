@@ -78,20 +78,20 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
   );
 
   if (vm.changesLoading) {
-    return <div style={{ padding: 14, ...mono, fontSize: 11, color: C.dim }}>scanning git…</div>;
+    return <div style={{ padding: 14, ...mono, fontSize: 12, color: C.text2 }}>scanning git…</div>;
   }
   if (vm.changesError) {
     return <div style={{ padding: 14, ...mono, fontSize: 11, color: C.accent }}>error: {vm.changesError}</div>;
   }
   if (!vm.changes) {
-    return <div style={{ padding: 14, ...mono, fontSize: 11, color: C.dim }}>click reload to scan</div>;
+    return <div style={{ padding: 14, ...mono, fontSize: 12, color: C.text2 }}>click reload to scan</div>;
   }
   if (vm.changes.warning && vm.changes.baseline === "none") {
     return <div style={{ padding: 14, ...mono, fontSize: 11, color: C.warn }}>{vm.changes.warning}</div>;
   }
   if (vm.changes.files.length === 0) {
     return (
-      <div style={{ padding: 14, ...mono, fontSize: 11, color: C.dim }}>
+      <div style={{ padding: 14, ...mono, fontSize: 12, color: C.text2 }}>
         no changes since {vm.sinceISO ? new Date(vm.sinceISO).toLocaleString() : "HEAD"}.
         {vm.sinceISO && <> (try reloading without the time filter — clicking refresh after the run completes)</>}
       </div>
@@ -101,11 +101,11 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
   return (
     <div>
       {vm.changes.warning && (
-        <div style={{ padding: "8px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 10, color: "#5a3e00" }}>
+        <div style={{ padding: "8px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 12, color: "#5a3e00" }}>
           {vm.changes.warning}
         </div>
       )}
-      <div style={{ padding: "8px 14px", borderBottom: `1px solid ${C.line}`, background: C.soft, ...mono, fontSize: 10, color: C.dim }}>
+      <div style={{ padding: "8px 14px", borderBottom: `1px solid ${C.line}`, background: C.soft, ...mono, fontSize: 12, color: C.text2 }}>
         baseline: {vm.changes.baseline}
         {vm.sinceISO && <> · filtered to files modified ≥ {new Date(vm.sinceISO).toLocaleTimeString()}</>}
         · totals: <span style={{ color: "#3a7a3a" }}>+{vm.changes.totalAdditions}</span> <span style={{ color: "#c14a3c" }}>-{vm.changes.totalDeletions}</span>
@@ -121,7 +121,7 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
               style={{ width: "100%", textAlign: "left", padding: "8px 14px", background: C.paper, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, ...mono, fontSize: 11 }}
             >
               {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-              <span style={{ display: "inline-block", padding: "1px 6px", border: `1px solid ${STATUS_COLOR[statusKey]}`, color: STATUS_COLOR[statusKey], fontSize: 9, letterSpacing: "0.08em" }}>
+              <span style={{ display: "inline-block", padding: "1px 6px", border: `1px solid ${STATUS_COLOR[statusKey]}`, color: STATUS_COLOR[statusKey], fontSize: 11, letterSpacing: "0.08em" }}>
                 {STATUS_LABEL[statusKey]}
               </span>
               <span style={{ flex: 1, wordBreak: "break-all" }}>{f.path}</span>
@@ -183,7 +183,7 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
 
   return (
     <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.25)", zIndex: 250 }} />
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,18,26,0.35)", zIndex: 250 }} />
       <aside style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: 760, maxWidth: "92vw", background: C.paper, borderLeft: `1px solid ${C.line}`, boxShadow: "-4px 0 16px rgba(0,0,0,0.18)", zIndex: 260, display: "flex", flexDirection: "column" }}>
         {/* Header */}
         <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", alignItems: "flex-start", gap: 10 }}>
@@ -193,7 +193,7 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
             </div>
             <div style={{ ...mono, fontSize: 11, fontWeight: 600, wordBreak: "break-all" }}>{vm.path}</div>
             {!vm.loading && !vm.error && (
-              <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 2 }}>
+              <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 2 }}>
                 {(vm.sizeBytes / 1024).toFixed(1)} kB · modified {new Date(vm.mtime).toLocaleString()}
                 {vm.sinceISO && <> · task started {new Date(vm.sinceISO).toLocaleString()}</>}
               </div>
@@ -215,14 +215,14 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
                 onClick={() => navigator.clipboard?.writeText(vm.content || "")}
                 disabled={vm.loading || !!vm.error}
                 title="copy file content"
-                style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}` }}
+                style={{ ...mono, fontSize: 12, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}` }}
               >
                 copy
               </button>
               <button
                 onClick={onReloadHandoff}
                 title="reload"
-                style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
+                style={{ ...mono, fontSize: 12, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
               >
                 <RotateCcw size={11} />
               </button>
@@ -233,7 +233,7 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
               onClick={onReloadChanges}
               disabled={vm.changesLoading}
               title="reload diff"
-              style={{ ...mono, fontSize: 10, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
+              style={{ ...mono, fontSize: 12, padding: "4px 10px", border: "none", background: "transparent", cursor: "pointer", borderLeft: `1px solid ${C.line}`, display: "flex", alignItems: "center" }}
             >
               <RotateCcw size={11} />
             </button>
@@ -245,7 +245,7 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
           {vm.tab === "handoff" && (
             <>
               {!vm.loading && !vm.error && vm.sizeBytes < 200 && (
-                <div style={{ padding: "10px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 10, color: "#5a3e00" }}>
+                <div style={{ padding: "10px 14px", background: "#fff7e0", borderBottom: `1px solid ${C.warn}`, ...mono, fontSize: 12, color: "#5a3e00" }}>
                   ⚠ Handoff body is empty (file = header only). The agent likely wrote
                   its result to a skill-managed file instead of stdout. Open the
                   <strong> Changes </strong> tab to see what files actually changed during this run.

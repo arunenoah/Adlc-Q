@@ -62,12 +62,12 @@ export const KanbanBoard = ({ byStage, taskBusy, taskStart, taskLogs, taskVarian
                   title={interactive ? "click to view live output" : undefined}
                   style={{ border: `1px solid ${isBusy ? C.accent : C.line}`, padding: 6, background: isBusy ? "#fff8f4" : "#fff", cursor: interactive ? "pointer" : "default" }}
                 >
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 2 }}>{t.parentTitle}</div>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 2 }}>{t.parentTitle}</div>
                   <div style={{ ...mono, fontSize: 11, lineHeight: 1.3 }}>
                     {isBusy ? "⟳ " : ""}{t.title}
                     {isBusy && <span style={{ color: C.accent, marginLeft: 4 }}>{Math.floor(elapsedMs / 1000)}s</span>}
                   </div>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
                     <span>{a?.emoji} {a?.name}</span>
                     {hasLogs && <span style={{ color: C.swarm }}>· log ↗</span>}
                   </div>
@@ -80,7 +80,7 @@ export const KanbanBoard = ({ byStage, taskBusy, taskStart, taskLogs, taskVarian
               );
             })}
             {(byStage[stage.id] || []).length === 0 && (
-              <div style={{ ...mono, fontSize: 9, color: C.dim, padding: 10, textAlign: "center" }}>—</div>
+              <div style={{ ...mono, fontSize: 11, color: C.text2, padding: 10, textAlign: "center" }}>—</div>
             )}
           </div>
         </div>

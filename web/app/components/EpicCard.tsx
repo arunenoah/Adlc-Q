@@ -112,23 +112,23 @@ const TaskRow: React.FC<{
           {isBusy && <span style={{ color: C.accent, marginLeft: 4 }}>· running {Math.floor(elapsedMs / 1000)}s</span>}
           <span style={{ color: C.dim }}> · {a?.emoji} {a?.name}</span>
           {projectAgent ? (
-            <span style={{ ...mono, fontSize: 10, marginLeft: 6, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }} title={projectAgent.description}>
+            <span style={{ ...mono, fontSize: 12, marginLeft: 6, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }} title={projectAgent.description}>
               .claude:{projectAgent.id}
             </span>
           ) : (
-            <span style={{ ...mono, fontSize: 10, marginLeft: 6, color: C.warn }} title="No project agent — falls back to standard role">
+            <span style={{ ...mono, fontSize: 12, marginLeft: 6, color: C.warn }} title="No project agent — falls back to standard role">
               ⚠ no project agent
             </span>
           )}
           {t.modelOverride && (
-            <span style={{ ...mono, fontSize: 10, marginLeft: 6, color: C.accent }} title="Model overridden for this task">override</span>
+            <span style={{ ...mono, fontSize: 12, marginLeft: 6, color: C.accent }} title="Model overridden for this task">override</span>
           )}
         </span>
         <select
           value={variantId || ""}
           onChange={(e) => onSetTaskOverride(t.id, e.target.value)}
           disabled={isBusy}
-          style={{ ...mono, fontSize: 10, padding: "2px 4px", border: `1px solid ${C.line}`, background: C.paper, color: C.ink, maxWidth: 180 }}
+          style={{ ...mono, fontSize: 12, padding: "2px 4px", border: `1px solid ${C.line}`, background: C.paper, color: C.ink, maxWidth: 180 }}
           title="Override model for this task"
         >
           {MODELS.flatMap((m) =>
@@ -145,7 +145,7 @@ const TaskRow: React.FC<{
         {isDone && (
           <button onClick={() => onResetTask(t.id)} disabled={isBusy}
             title="Reset to backlog"
-            style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${C.line}`, background: C.paper, cursor: "pointer" }}>
+            style={{ ...mono, fontSize: 12, padding: "3px 8px", border: `1px solid ${C.line}`, background: C.paper, cursor: "pointer" }}>
             <RotateCcw size={10} />
           </button>
         )}
@@ -153,7 +153,7 @@ const TaskRow: React.FC<{
           onClick={() => onRunOneTask(t.id)}
           disabled={isBusy || !project.workspacePath || cliInstalled === false || (gated && !isDone)}
           title={gated && !isDone ? "Locked — complete scope + spec first" : cliInstalled === false ? `${found?.model.cmd} not on PATH` : isDone ? "Re-run this task" : "Run this task"}
-          style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${(gated && !isDone) ? C.dim : cliInstalled === false ? C.warn : C.ink}`, background: (gated && !isDone) ? C.soft : cliInstalled === false ? C.soft : C.ink, color: (gated && !isDone) || cliInstalled === false ? C.dim : C.paper, cursor: ((gated && !isDone) || cliInstalled === false) ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 3 }}
+          style={{ ...mono, fontSize: 12, padding: "3px 8px", border: `1px solid ${(gated && !isDone) ? C.dim : cliInstalled === false ? C.warn : C.ink}`, background: (gated && !isDone) ? C.soft : cliInstalled === false ? C.soft : C.ink, color: (gated && !isDone) || cliInstalled === false ? C.dim : C.paper, cursor: ((gated && !isDone) || cliInstalled === false) ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 3 }}
         >
           {isBusy ? "⟳" : (gated && !isDone) ? <Lock size={9} /> : <Play size={9} />} {isDone ? "rerun" : (gated && !isDone) ? "locked" : "run"}
         </button>
@@ -170,7 +170,7 @@ const TaskRow: React.FC<{
               });
             }}
             title={`Open ${handoffPath}`}
-            style={{ ...mono, fontSize: 9, color: C.swarm, background: "transparent", border: `1px dashed ${C.swarm}`, padding: "2px 5px", cursor: "pointer", borderRadius: 2 }}
+            style={{ ...mono, fontSize: 11, color: C.swarm, background: "transparent", border: `1px dashed ${C.swarm}`, padding: "2px 5px", cursor: "pointer", borderRadius: 2 }}
           >
             📄 {handoffPath.split("/").slice(-2).join("/")}
           </button>
@@ -178,7 +178,7 @@ const TaskRow: React.FC<{
         {t.key === "spec" && isDone && (
           <button onClick={() => onOpenSplitModal(epic)}
             title="Break spec into parallel implementation subtasks"
-            style={{ ...mono, fontSize: 10, padding: "3px 8px", border: `1px solid ${C.swarm}`, background: C.paper, color: C.swarm, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
+            style={{ ...mono, fontSize: 12, padding: "3px 8px", border: `1px solid ${C.swarm}`, background: C.paper, color: C.swarm, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
             ✂ split
           </button>
         )}
@@ -191,7 +191,7 @@ const TaskRow: React.FC<{
         )}
       </div>
       {taskExpand[t.id] && (taskLogs[t.id] || isBusy) && (
-        <div style={{ borderTop: `1px dashed ${C.dim}`, background: C.terminal, color: C.termOk, padding: 8, ...mono, fontSize: 10, maxHeight: 260, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+        <div style={{ borderTop: `1px dashed ${C.dim}`, background: C.terminal, color: C.termOk, padding: 8, ...mono, fontSize: 12, maxHeight: 260, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
           {taskLogs[t.id] || (isBusy ? "(waiting for output…)" : "(no output)")}
           {isBusy && <div style={{ color: C.termWarn, marginTop: 4 }}>⟳ still running…</div>}
         </div>
@@ -216,7 +216,7 @@ export const EpicCard = (props: EpicCardProps) => {
           <div style={{ ...serif, fontSize: 15 }}>
             {epic.title} {p.complete && <Check size={14} style={{ display: "inline", color: C.ok, verticalAlign: "middle" }} />}
           </div>
-          <div style={{ ...mono, fontSize: 10, color: C.dim, marginTop: 2 }}>
+          <div style={{ ...mono, fontSize: 12, color: C.text2, marginTop: 2 }}>
             {p.done}/{p.total} subtasks complete
           </div>
         </div>
@@ -264,7 +264,7 @@ export const EpicCard = (props: EpicCardProps) => {
       {!collapsed && (
         <div style={{ borderTop: `1px dashed ${C.dim}`, padding: 8, display: "flex", flexDirection: "column", gap: 3 }}>
           {epic.brief && (
-            <div style={{ ...mono, fontSize: 11, color: C.dim, padding: "4px 8px", marginBottom: 4 }}>{epic.brief}</div>
+            <div style={{ ...mono, fontSize: 12, color: C.text2, padding: "4px 8px", marginBottom: 4 }}>{epic.brief}</div>
           )}
           {epic.graphImpact && <EpicGraphImpact impact={epic.graphImpact} />}
           {tasks.map((t) => (

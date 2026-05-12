@@ -104,10 +104,10 @@ export const ProjectAgentRoster = ({ project, clis, activeAgent, onUpdateProject
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ ...mono, fontSize: 11, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={agent.description}>{agent.name}</div>
-                    {role && <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 2 }}>{role.emoji} {role.name}</div>}
+                    {role && <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 2 }}>{role.emoji} {role.name}</div>}
                   </div>
                   {found && (
-                    <span style={{ ...mono, fontSize: 9, padding: "2px 6px", background: subActive ? found.model.color : C.soft, color: subActive ? C.paper : C.dim, whiteSpace: "nowrap" }}>
+                    <span style={{ ...mono, fontSize: 11, padding: "2px 6px", background: subActive ? found.model.color : C.soft, color: subActive ? C.paper : C.dim, whiteSpace: "nowrap" }}>
                       {found.variant.name}{!subActive && " 🔒"}
                     </span>
                   )}
@@ -115,15 +115,15 @@ export const ProjectAgentRoster = ({ project, clis, activeAgent, onUpdateProject
                 {linkedSkills.length > 0 && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 6 }}>
                     {linkedSkills.slice(0, 4).map((s) => (
-                      <span key={s.id} title={s.description} style={{ ...mono, fontSize: 9, padding: "1px 5px", border: `1px solid ${C.swarm}`, color: C.swarm }}>
+                      <span key={s.id} title={s.description} style={{ ...mono, fontSize: 11, padding: "2px 8px", border: `1px solid ${C.swarm}`, color: C.swarm }}>
                         <Sparkles size={8} style={{ display: "inline", verticalAlign: "middle", marginRight: 2 }} />{s.name}
                       </span>
                     ))}
-                    {linkedSkills.length > 4 && <span style={{ ...mono, fontSize: 9, color: C.dim }}>+{linkedSkills.length - 4}</span>}
+                    {linkedSkills.length > 4 && <span style={{ ...mono, fontSize: 11, color: C.text2 }}>+{linkedSkills.length - 4}</span>}
                   </div>
                 )}
                 {linkedSkills.length === 0 && (
-                  <div style={{ ...mono, fontSize: 9, color: C.warn, marginTop: 6 }}>no skill linked</div>
+                  <div style={{ ...mono, fontSize: 11, color: C.warn, marginTop: 6 }}>no skill linked</div>
                 )}
               </div>
             );
@@ -141,17 +141,17 @@ export const ProjectAgentRoster = ({ project, clis, activeAgent, onUpdateProject
                 key={r.id}
                 onClick={() => handleBuild(r)}
                 disabled={busyRole === r.id || !project.workspacePath}
-                style={{ ...mono, fontSize: 10, padding: "4px 8px", border: `1px solid ${C.warn}`, background: busyRole === r.id ? C.soft : C.paper, color: C.ink, cursor: project.workspacePath ? "pointer" : "not-allowed", display: "flex", alignItems: "center", gap: 4 }}
+                style={{ ...mono, fontSize: 12, padding: "4px 8px", border: `1px solid ${C.warn}`, background: busyRole === r.id ? C.soft : C.paper, color: C.ink, cursor: project.workspacePath ? "pointer" : "not-allowed", display: "flex", alignItems: "center", gap: 4 }}
               >
                 {busyRole === r.id ? "…" : <Plus size={10} />} {r.emoji} {r.name}
               </button>
             ))}
           </div>
           {!project.workspacePath && (
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 4 }}>build disabled — project has no workspacePath</div>
+            <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 4 }}>build disabled — project has no workspacePath</div>
           )}
           {error && (
-            <div style={{ ...mono, fontSize: 9, color: C.accent, marginTop: 4 }}>{error}</div>
+            <div style={{ ...mono, fontSize: 11, color: C.accent, marginTop: 4 }}>{error}</div>
           )}
         </div>
       )}

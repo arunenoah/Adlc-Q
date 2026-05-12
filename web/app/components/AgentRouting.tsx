@@ -68,14 +68,14 @@ export const AgentRouting = ({ agentModels, onChange, clis, onPreset }: Props) =
               <div style={{ ...mono, fontSize: 16, width: 20, textAlign: "center" }}>{agent.emoji}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ ...mono, fontSize: 11 }}>{agent.name}</div>
-                <div style={{ ...mono, fontSize: 9, color: C.dim }}>{agent.desc}</div>
+                <div style={{ ...mono, fontSize: 11, color: C.text2 }}>{agent.desc}</div>
               </div>
               <select
                 value={variantId || ""}
                 onChange={(e) => onChange(agent.id, e.target.value)}
                 style={{
                   ...mono,
-                  fontSize: 10,
+                  fontSize: 12,
                   padding: "4px 6px",
                   border: `1px solid ${active && found ? found.model.color : C.accent}`,
                   background: active && found ? found.model.color : "#fff",

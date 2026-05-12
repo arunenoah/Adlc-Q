@@ -71,7 +71,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
 
   return (
     <div
-      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
+      style={{ position: "fixed", inset: 0, background: "rgba(15,18,26,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{ background: C.paper, border: `1px solid ${C.line}`, padding: 18, width: 520, maxWidth: "90vw" }}>
@@ -79,7 +79,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
           <div style={{ ...serif, fontSize: 18, fontWeight: 600 }}>New feature workflow</div>
           <button onClick={onClose} style={{ background: "transparent", border: "none", cursor: "pointer" }}><X size={16} /></button>
         </div>
-        <div style={{ ...mono, fontSize: 10, color: C.dim, marginBottom: 12 }}>
+        <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 12 }}>
           Generates graph impact analysis from <code>{project.workspacePath || "(no workspace path)"}/graphify-out/graph.json</code> and breaks the feature into role-bound subtasks.
         </div>
         <div style={{ marginBottom: 10 }}>
@@ -98,7 +98,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
               <button
                 key={t}
                 onClick={() => setType(t)}
-                style={{ ...mono, fontSize: 10, padding: "6px 12px", border: `1px solid ${C.line}`, background: type === t ? C.ink : C.paper, color: type === t ? C.paper : C.ink, cursor: "pointer", letterSpacing: "0.12em" }}
+                style={{ ...mono, fontSize: 12, padding: "6px 12px", border: `1px solid ${C.line}`, background: type === t ? C.ink : C.paper, color: type === t ? C.paper : C.ink, cursor: "pointer", letterSpacing: "0.12em" }}
               >
                 {t}
               </button>
@@ -121,11 +121,11 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
             <span>
               <button
                 onClick={() => setSelectedKeys(new Set(tmpl.map((s) => s.key)))}
-                style={{ ...mono, fontSize: 9, padding: "1px 6px", background: "transparent", border: `1px solid ${C.line}`, marginRight: 4, cursor: "pointer" }}
+                style={{ ...mono, fontSize: 11, padding: "2px 8px", background: "transparent", border: `1px solid ${C.line}`, marginRight: 4, cursor: "pointer" }}
               >all</button>
               <button
                 onClick={() => setSelectedKeys(new Set())}
-                style={{ ...mono, fontSize: 9, padding: "1px 6px", background: "transparent", border: `1px solid ${C.line}`, cursor: "pointer" }}
+                style={{ ...mono, fontSize: 11, padding: "2px 8px", background: "transparent", border: `1px solid ${C.line}`, cursor: "pointer" }}
               >none</button>
             </span>
           </div>
@@ -136,7 +136,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
               return (
                 <label
                   key={s.key}
-                  style={{ ...mono, fontSize: 10, padding: "3px 4px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", background: checked ? C.soft : "transparent" }}
+                  style={{ ...mono, fontSize: 12, padding: "3px 4px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", background: checked ? C.soft : "transparent" }}
                 >
                   <input type="checkbox" checked={checked} onChange={() => toggleKey(s.key)} />
                   <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.title}</span>
@@ -146,7 +146,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
             })}
           </div>
         </div>
-        {error && <div style={{ ...mono, fontSize: 10, color: C.accent, marginBottom: 10 }}>{error}</div>}
+        {error && <div style={{ ...mono, fontSize: 12, color: C.accent, marginBottom: 10 }}>{error}</div>}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
           <Btn onClick={onClose}>cancel</Btn>
           <Btn primary onClick={submit} disabled={busy || !title.trim()}>

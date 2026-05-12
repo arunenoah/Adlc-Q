@@ -37,7 +37,7 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
             <Network size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />
             Discoverable from Workspace
           </div>
-          <div style={{ ...mono, fontSize: 11, color: C.dim }}>
+          <div style={{ ...mono, fontSize: 12, color: C.text2 }}>
             {projects.length} project{projects.length === 1 ? "" : "s"} with graphify metadata · click import to bring under Adlc-Q management
           </div>
         </div>
@@ -60,11 +60,11 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ ...serif, fontSize: 17, fontWeight: 600 }}>{d.dirName}</div>
-                  <div style={{ ...mono, fontSize: 10, color: C.dim, wordBreak: "break-all" }}>{d.workspacePath}</div>
+                  <div style={{ ...mono, fontSize: 12, color: C.text2, wordBreak: "break-all" }}>{d.workspacePath}</div>
                 </div>
                 <Tag color={C.swarm}>{d.stackLabel}</Tag>
               </div>
-              <div style={{ display: "flex", gap: 14, marginTop: 10, ...mono, fontSize: 10, color: C.dim }}>
+              <div style={{ display: "flex", gap: 14, marginTop: 10, ...mono, fontSize: 12, color: C.text2 }}>
                 <span><Network size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />{d.graphMeta.nodes.toLocaleString()} nodes</span>
                 <span>{d.graphMeta.edges.toLocaleString()} edges</span>
                 <span>{d.graphMeta.communities} communities</span>
@@ -72,9 +72,9 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               </div>
               {top.length > 0 && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>God Nodes</div>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 4 }}>God Nodes</div>
                   {top.map((g) => (
-                    <div key={g.name} style={{ ...mono, fontSize: 10, display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
+                    <div key={g.name} style={{ ...mono, fontSize: 12, display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginRight: 8 }}>{g.name}</span>
                       <span style={{ color: C.dim }}>{g.edges} edges</span>
                     </div>
@@ -83,34 +83,34 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               )}
               {d.graphMeta.suggestedQuestions.length > 0 && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 4 }}>
                     <Sparkles size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />Suggested
                   </div>
-                  <div style={{ ...mono, fontSize: 10, color: C.ink, lineHeight: 1.4 }}>
+                  <div style={{ ...mono, fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
                     {d.graphMeta.suggestedQuestions[0]}
                   </div>
                 </div>
               )}
               {(d.skills.length > 0 || d.agents.length > 0 || d.commands.length > 0) && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 4 }}>
                     <Sparkles size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
                     .claude — {d.skills.length} skills · {d.agents.length} agents · {d.commands.length} commands
                   </div>
                   {d.skills.slice(0, 3).map((s) => (
-                    <div key={s.id} title={s.description} style={{ ...mono, fontSize: 10, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div key={s.id} title={s.description} style={{ ...mono, fontSize: 12, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       <Sparkles size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3, color: C.swarm }} />
                       <span style={{ color: C.ink }}>{s.name}</span>
                     </div>
                   ))}
                   {d.agents.slice(0, 3).map((a) => (
-                    <div key={a.id} title={a.description} style={{ ...mono, fontSize: 10, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div key={a.id} title={a.description} style={{ ...mono, fontSize: 12, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       <Bot size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3, color: C.accent }} />
                       <span style={{ color: C.ink }}>{a.name}</span>
                     </div>
                   ))}
                   {(d.skills.length + d.agents.length) > 6 && (
-                    <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 2 }}>+{(d.skills.length + d.agents.length) - 6} more</div>
+                    <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 2 }}>+{(d.skills.length + d.agents.length) - 6} more</div>
                   )}
                 </div>
               )}

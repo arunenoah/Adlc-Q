@@ -39,7 +39,7 @@ export const ProjectClaudeAssets = ({ project }: { project: Project }) => {
             <button
               key={t.id}
               onClick={() => { setTab(t.id); setExpandedId(null); }}
-              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "4px 10px", ...mono, fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "4px 10px", ...mono, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
             >
               <Icon size={10} /> {t.label} {t.count > 0 && <span style={{ color: active ? C.paper : C.dim }}>{t.count}</span>}
             </button>
@@ -47,7 +47,7 @@ export const ProjectClaudeAssets = ({ project }: { project: Project }) => {
         })}
       </div>
       {items.length === 0 ? (
-        <div style={{ ...mono, fontSize: 10, color: C.dim, padding: "6px 0" }}>none</div>
+        <div style={{ ...mono, fontSize: 12, color: C.text2, padding: "6px 0" }}>none</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 6 }}>
           {items.map((it) => {
@@ -60,12 +60,12 @@ export const ProjectClaudeAssets = ({ project }: { project: Project }) => {
               >
                 <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: expanded ? "normal" : "nowrap" }}>{it.name}</div>
                 {it.description && (
-                  <div style={{ ...mono, fontSize: 10, color: C.dim, marginTop: 3, lineHeight: 1.4, overflow: "hidden", display: expanded ? "block" : "-webkit-box", WebkitLineClamp: expanded ? "unset" : 2, WebkitBoxOrient: "vertical" }}>
+                  <div style={{ ...mono, fontSize: 12, color: C.text2, marginTop: 3, lineHeight: 1.4, overflow: "hidden", display: expanded ? "block" : "-webkit-box", WebkitLineClamp: expanded ? "unset" : 2, WebkitBoxOrient: "vertical" }}>
                     {it.description}
                   </div>
                 )}
                 {expanded && (
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 4, wordBreak: "break-all" }}>{it.path}</div>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 4, wordBreak: "break-all" }}>{it.path}</div>
                 )}
               </div>
             );

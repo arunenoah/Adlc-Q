@@ -19,7 +19,7 @@ export const EpicGraphImpact = ({ impact }: { impact?: GraphImpact }) => {
 
   if (empty) {
     return (
-      <div style={{ ...mono, fontSize: 10, color: C.dim, padding: "4px 8px", marginBottom: 4 }}>
+      <div style={{ ...mono, fontSize: 12, color: C.text2, padding: "4px 8px", marginBottom: 4 }}>
         graph: no matches for keywords [{(impact?.keywords || []).join(", ") || "—"}]
       </div>
     );
@@ -37,18 +37,18 @@ export const EpicGraphImpact = ({ impact }: { impact?: GraphImpact }) => {
       {open && (
         <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div>
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 3 }}>keywords</div>
+            <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 3 }}>keywords</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
               {impact!.keywords.map((k) => (
-                <span key={k} style={{ ...mono, fontSize: 9, padding: "1px 5px", border: `1px solid ${C.dim}`, color: C.ink }}>{k}</span>
+                <span key={k} style={{ ...mono, fontSize: 11, padding: "2px 8px", border: `1px solid ${C.dim}`, color: C.ink }}>{k}</span>
               ))}
             </div>
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 3 }}>matched nodes</div>
+            <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 3 }}>matched nodes</div>
             {impact!.matchedNodes.slice(0, 6).map((n) => (
               <div
                 key={n.id}
                 title={`${n.file}${n.location ? ":" + n.location : ""}`}
-                style={{ ...mono, fontSize: 10, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                style={{ ...mono, fontSize: 12, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
               >
                 <span style={{ color: C.swarm }}>{n.label}</span>
                 <span style={{ color: C.dim, marginLeft: 4 }}>·{n.matchScore}</span>
@@ -56,21 +56,21 @@ export const EpicGraphImpact = ({ impact }: { impact?: GraphImpact }) => {
             ))}
           </div>
           <div>
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 3 }}>affected files</div>
+            <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 3 }}>affected files</div>
             {impact!.affectedFiles.slice(0, 6).map((f) => (
               <div
                 key={f}
                 title={f}
-                style={{ ...mono, fontSize: 9, color: C.ink, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                style={{ ...mono, fontSize: 11, color: C.ink, padding: "1px 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
               >
                 {f.split("/").slice(-2).join("/")}
               </div>
             ))}
             {impact!.touchedGodNodes.length > 0 && (
               <>
-                <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 6, marginBottom: 3 }}>god-nodes 1-hop</div>
+                <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 6, marginBottom: 3 }}>god-nodes 1-hop</div>
                 {impact!.touchedGodNodes.map((g) => (
-                  <div key={g.name} style={{ ...mono, fontSize: 10, color: C.accent, padding: "1px 0" }}>★ {g.name}</div>
+                  <div key={g.name} style={{ ...mono, fontSize: 12, color: C.accent, padding: "1px 0" }}>★ {g.name}</div>
                 ))}
               </>
             )}

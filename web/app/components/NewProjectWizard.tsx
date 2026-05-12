@@ -32,7 +32,7 @@ const StackPicker = ({ label, icon: Icon, opts, value, onChange }: StackPickerPr
         <button
           key={o.id}
           onClick={() => onChange(o.id)}
-          style={{ background: value === o.id ? C.ink : "transparent", color: value === o.id ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "6px 10px", ...mono, fontSize: 10, cursor: "pointer" }}
+          style={{ background: value === o.id ? C.ink : "transparent", color: value === o.id ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "6px 10px", ...mono, fontSize: 12, cursor: "pointer" }}
         >
           {o.name}
         </button>
@@ -66,7 +66,7 @@ export const NewProjectWizard = ({ onCreate, onCancel, clis }: Props) => {
   return (
     <div style={{ border: `1px solid ${C.line}`, padding: 20, maxWidth: 760 }}>
       <div style={{ ...serif, fontSize: 22, marginBottom: 4 }}>New Project</div>
-      <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 18 }}>
+      <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 18 }}>
         define project · pick stack · route each agent to its best model
       </div>
 

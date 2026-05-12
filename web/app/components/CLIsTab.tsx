@@ -20,7 +20,7 @@ type Props = {
 
 export const CLIsTab = ({ clis, onToggle }: Props) => (
   <div>
-    <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 16 }}>
+    <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 16 }}>
       bring any terminal model · each CLI can have multiple variants (Opus/Sonnet/Haiku, GPT-5/Mini, etc.)
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
@@ -34,30 +34,30 @@ export const CLIsTab = ({ clis, onToggle }: Props) => (
                 <div style={{ width: 10, height: 10, background: m.color }} />
                 <div>
                   <div style={{ ...serif, fontSize: 17 }}>{m.name}</div>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim }}>{m.vendor}</div>
+                  <div style={{ ...mono, fontSize: 11, color: C.text2 }}>{m.vendor}</div>
                 </div>
               </div>
               {active ? <Tag color={C.ok}>connected</Tag> : <Tag color={C.dim}>not connected</Tag>}
             </div>
 
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 6, letterSpacing: "0.1em" }}>variants</div>
+            <div style={{ ...mono, fontSize: 11, color: C.text2, marginBottom: 6, letterSpacing: "0.1em" }}>variants</div>
             {m.variants.map((v) => (
               <div
                 key={v.id}
-                style={{ ...mono, fontSize: 10, color: active ? C.ink : C.dim, padding: "3px 0", display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.dim}` }}
+                style={{ ...mono, fontSize: 12, color: active ? C.ink : C.dim, padding: "3px 0", display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.dim}` }}
               >
                 <span>{v.name}</span>
-                <span style={{ fontSize: 9, color: C.dim }}>{v.strength}</span>
+                <span style={{ fontSize: 11, color: C.text2 }}>{v.strength}</span>
               </div>
             ))}
 
-            <div style={{ ...mono, fontSize: 10, color: C.dim, padding: "6px 8px", background: C.soft, margin: "10px 0" }}>
+            <div style={{ ...mono, fontSize: 12, color: C.text2, padding: "6px 8px", background: C.soft, margin: "10px 0" }}>
               $ {m.cmd} ...
             </div>
 
             {active ? (
               <>
-                <div style={{ ...mono, fontSize: 10, marginBottom: 4 }}>
+                <div style={{ ...mono, fontSize: 12, marginBottom: 4 }}>
                   Plan: <span style={{ color: C.ok }}>{sub.plan}</span> · renews {sub.until}
                 </div>
                 <Btn small onClick={() => onToggle(m.id)}>disconnect</Btn>

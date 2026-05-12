@@ -719,7 +719,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
           <ArrowLeft size={14} />
         </button>
         <div style={{ flex: 1 }}>
-          <div style={{ ...mono, fontSize: 11, color: C.text3 }}>PROJECT · PM: {project.pm}</div>
+          <div style={{ ...mono, fontSize: 12, color: C.text2 }}>PROJECT · PM: {project.pm}</div>
           <div style={{ ...serif, fontSize: 24, fontWeight: 600 }}>{project.name}</div>
         </div>
         <Btn onClick={() => setShowRouting(!showRouting)}><Settings size={11} /> routing</Btn>
@@ -790,7 +790,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
           <AlertCircle size={16} color={C.accent} />
           <div style={{ flex: 1 }}>
             <div style={{ ...mono, fontSize: 11 }}>{blockedAgents.length} agent{blockedAgents.length === 1 ? "" : "s"} blocked — CLI not connected</div>
-            <div style={{ ...mono, fontSize: 10, color: C.dim }}>
+            <div style={{ ...mono, fontSize: 12, color: C.text2 }}>
               {blockedAgents.map((a) => a.name).join(", ")} → reroute via Routing panel or connect the CLI
             </div>
           </div>
@@ -819,7 +819,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
                 border: `1px solid ${active ? C.accent : C.line}`,
                 background: active ? C.accent : C.paper,
                 color: active ? C.paper : C.ink,
-                ...mono, fontSize: 10,
+                ...mono, fontSize: 12,
                 display: "flex", alignItems: "center", gap: 6,
                 transition: "all 200ms",
                 opacity: subActive ? 1 : 0.5,
@@ -827,7 +827,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
                 <div style={{ padding: "4px 8px", display: "flex", alignItems: "center", gap: 4, borderRight: `1px solid ${active ? C.paper : C.line}` }}>
                   <span>{a.emoji}</span> {a.name}
                 </div>
-                <div style={{ padding: "4px 8px", background: active ? "transparent" : found.model.color, color: C.paper, fontSize: 9, display: "flex", alignItems: "center", gap: 3 }}>
+                <div style={{ padding: "4px 8px", background: active ? "transparent" : found.model.color, color: C.paper, fontSize: 11, display: "flex", alignItems: "center", gap: 3 }}>
                   {found.variant.name}
                   {!subActive && <Lock size={8} />}
                 </div>
@@ -906,11 +906,11 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
 const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
   <div>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-      <div style={{ ...mono, fontSize: 11, color: C.dim }}>{projects.length} managed project{projects.length === 1 ? "" : "s"} · per-agent model routing</div>
+      <div style={{ ...mono, fontSize: 12, color: C.text2 }}>{projects.length} managed project{projects.length === 1 ? "" : "s"} · per-agent model routing</div>
       <Btn primary onClick={onNew}><FolderPlus size={11} /> new project</Btn>
     </div>
     {projects.length === 0 && (
-      <div style={{ ...mono, fontSize: 11, color: C.dim, padding: 24, border: `1px dashed ${C.dim}`, textAlign: "center" }}>
+      <div style={{ ...mono, fontSize: 12, color: C.text2, padding: 24, border: `1px dashed ${C.dim}`, textAlign: "center" }}>
         No managed projects yet. Import one from your workspace below, or click <strong>new project</strong>.
       </div>
     )}
@@ -931,7 +931,7 @@ const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
               <X size={11} />
             </button>
             <div onClick={() => onOpen(p)} style={{ cursor: "pointer" }}>
-              <div style={{ ...mono, fontSize: 11, color: C.text3 }}>
+              <div style={{ ...mono, fontSize: 12, color: C.text2 }}>
                 PM · {p.pm}{isWorkspaceProject && " · WORKSPACE"}
               </div>
               <div style={{ ...serif, fontSize: 18, marginTop: 4, paddingRight: 18 }}>{p.name}</div>
@@ -947,7 +947,7 @@ const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
                 )}
               </div>
               {p.graphMeta && (
-                <div style={{ ...mono, fontSize: 10, color: C.dim, marginTop: 8, display: "flex", gap: 10 }}>
+                <div style={{ ...mono, fontSize: 12, color: C.text2, marginTop: 8, display: "flex", gap: 10 }}>
                   <span><Network size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />{p.graphMeta.nodes.toLocaleString()}n</span>
                   <span>{p.graphMeta.edges.toLocaleString()}e</span>
                   {p.graphMeta.godNodes[0] && <span style={{ color: C.swarm, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>★ {p.graphMeta.godNodes[0].name}</span>}
@@ -963,7 +963,7 @@ const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
                   );
                 })}
               </div>
-              <div style={{ ...mono, fontSize: 10, color: C.dim, marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
+              <div style={{ ...mono, fontSize: 12, color: C.text2, marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
                 {p.epics.length} epic{p.epics.length === 1 ? "" : "s"} → {p.epics.length * 8} subtasks
               </div>
             </div>
@@ -1077,7 +1077,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
             <div style={{ position: "absolute", inset: 3, background: C.accent }} />
           </div>
           <div style={{ ...serif, fontSize: 18, fontWeight: 600 }}>Adlc-Q</div>
-          <div style={{ ...mono, fontSize: 11, color: C.text3 }}>v0.7 · BYO-CLI</div>
+          <div style={{ ...mono, fontSize: 12, color: C.text2 }}>v0.7 · BYO-CLI</div>
         </div>
       </div>
 
@@ -1102,7 +1102,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
         {tab === "projects" && !openProject && !creating && (
           <>
             <div style={{ ...serif, fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 4 }}>Projects</div>
-            <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 20 }}>route each agent to its best model · Opus for review · Codex for QA · Gemini for ops</div>
+            <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 20 }}>route each agent to its best model · Opus for review · Codex for QA · Gemini for ops</div>
             <ProjectsList projects={projects} onOpen={setOpenProject} onNew={() => setCreating(true)} onDelete={deleteProject} />
             <ImportFromWorkspace projects={discoveredProjects} importedPaths={importedIds} onImport={importDiscovered} />
           </>
@@ -1118,14 +1118,14 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
         {tab === "clis" && (
           <>
             <div style={{ ...serif, fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 4 }}>Connected CLIs</div>
-            <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 20 }}>your installed terminal models · Adlc-Q shells out to whichever you connect · auth stays with the CLI</div>
+            <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 20 }}>your installed terminal models · Adlc-Q shells out to whichever you connect · auth stays with the CLI</div>
             <CLIsTab clis={clis} onToggle={toggleCLI} />
           </>
         )}
         {tab === "agents" && (
           <>
             <div style={{ ...serif, fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 4 }}>Agents</div>
-            <div style={{ ...mono, fontSize: 11, color: C.dim, marginBottom: 20 }}>specialists with recommended model defaults · override per project</div>
+            <div style={{ ...mono, fontSize: 12, color: C.text2, marginBottom: 20 }}>specialists with recommended model defaults · override per project</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
               {AGENTS.map((a) => {
                 const found = findModelVariant(a.recommend);
@@ -1133,11 +1133,11 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
                   <div key={a.id} style={{ border: `1px solid ${C.line}`, padding: 14, background: C.paper }}>
                     <div style={{ ...mono, fontSize: 22 }}>{a.emoji}</div>
                     <div style={{ ...serif, fontSize: 17, marginTop: 6 }}>{a.name}</div>
-                    <div style={{ ...mono, fontSize: 11, color: C.dim, marginTop: 4 }}>{a.desc}</div>
-                    <div style={{ ...mono, fontSize: 9, color: C.dim, marginTop: 10, paddingTop: 8, borderTop: `1px dashed ${C.dim}` }}>
+                    <div style={{ ...mono, fontSize: 12, color: C.text2, marginTop: 4 }}>{a.desc}</div>
+                    <div style={{ ...mono, fontSize: 11, color: C.text2, marginTop: 10, paddingTop: 8, borderTop: `1px dashed ${C.dim}` }}>
                       DEFAULT MODEL
                     </div>
-                    <div style={{ ...mono, fontSize: 10, color: C.paper, background: found.model.color, padding: "2px 6px", marginTop: 4, display: "inline-block" }}>
+                    <div style={{ ...mono, fontSize: 12, color: C.paper, background: found.model.color, padding: "2px 6px", marginTop: 4, display: "inline-block" }}>
                       {found.model.name} · {found.variant.name}
                     </div>
                   </div>
@@ -1148,7 +1148,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
         )}
       </div>
 
-      <div style={{ borderTop: `1px solid ${C.line}`, padding: "10px 20px", ...mono, fontSize: 11, color: C.text3, display: "flex", justifyContent: "space-between" }}>
+      <div style={{ borderTop: `1px solid ${C.line}`, padding: "10px 20px", ...mono, fontSize: 12, color: C.text2, display: "flex", justifyContent: "space-between" }}>
         <span>devos · per-agent model routing</span>
         <span>right model · right job</span>
       </div>
