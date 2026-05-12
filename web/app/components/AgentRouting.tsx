@@ -45,7 +45,7 @@ export const AgentRouting = ({ agentModels, onChange, clis, onPreset }: Props) =
   return (
     <div style={{ border: `1px solid ${C.line}`, padding: 14, background: C.paper, marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <div style={{ ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ ...mono, fontSize: 12, fontWeight: 500, color: C.dim, display: "flex", alignItems: "center", gap: 6 }}>
           <Settings size={11} /> agent → model routing
         </div>
         <div style={{ display: "flex", gap: 6 }}>

@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
+/* Adlc-Q design tokens.
+   Sourced from lib/theme.ts (TypeScript) — kept in sync. CSS vars exist so
+   <input>, <select>, scrollbars etc. inherit correctly without inline styles. */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --bg-canvas: #fafafa;
+  --bg-card:   #ffffff;
+  --bg-soft:   #f4f4f5;
+
+  /* Text */
+  --text-1: #0a0a0a;       /* primary       — 18.7:1 on canvas */
+  --text-2: #525866;       /* secondary     —  7.6:1 (AAA) */
+  --text-3: #71717a;       /* tertiary      —  4.6:1 (AA body) */
+
+  /* Borders */
+  --border-1: #e5e7eb;     /* hairline */
+  --border-2: #d1d5db;     /* default */
+
+  /* Accent */
+  --accent:  #e8472c;
+  --ok:      #16a34a;
+  --warn:    #d97706;
+  --info:    #2563eb;
+
+  /* Type */
+  --font-sans-stack: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono-stack: var(--font-mono), "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-1);
+  font-family: var(--font-sans-stack);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
+
+/* Scrollbars: subtle, not the default chrome */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 999px; border: 2px solid var(--bg-canvas); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }

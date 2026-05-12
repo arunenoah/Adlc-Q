@@ -121,7 +121,7 @@ export const ChangesTab = ({ vm, setVm }: ChangesTabProps) => {
               style={{ width: "100%", textAlign: "left", padding: "8px 14px", background: C.paper, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 10, ...mono, fontSize: 11 }}
             >
               {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-              <span style={{ display: "inline-block", padding: "1px 6px", border: `1px solid ${STATUS_COLOR[statusKey]}`, color: STATUS_COLOR[statusKey], fontSize: 9, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <span style={{ display: "inline-block", padding: "1px 6px", border: `1px solid ${STATUS_COLOR[statusKey]}`, color: STATUS_COLOR[statusKey], fontSize: 9, letterSpacing: "0.08em" }}>
                 {STATUS_LABEL[statusKey]}
               </span>
               <span style={{ flex: 1, wordBreak: "break-all" }}>{f.path}</span>
@@ -188,7 +188,7 @@ export const HandoffDrawer = ({ vm, setVm, onClose, onSwitchTab, onReloadHandoff
         {/* Header */}
         <div style={{ padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", alignItems: "flex-start", gap: 10 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim }}>
+            <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim }}>
               handoff{vm.taskTitle ? ` · ${vm.taskTitle}` : ""}
             </div>
             <div style={{ ...mono, fontSize: 11, fontWeight: 600, wordBreak: "break-all" }}>{vm.path}</div>

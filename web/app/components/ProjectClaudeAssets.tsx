@@ -28,7 +28,7 @@ export const ProjectClaudeAssets = ({ project }: { project: Project }) => {
 
   return (
     <div style={{ border: `1px solid ${C.line}`, padding: 10, marginBottom: 12 }}>
-      <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
         <Package size={10} /> .claude assets — {skills.length} skills · {agents.length} agents · {commands.length} commands
       </div>
       <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
@@ -39,7 +39,7 @@ export const ProjectClaudeAssets = ({ project }: { project: Project }) => {
             <button
               key={t.id}
               onClick={() => { setTab(t.id); setExpandedId(null); }}
-              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "4px 10px", ...mono, fontSize: 10, letterSpacing: "0.10em", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: `1px solid ${C.line}`, padding: "4px 10px", ...mono, fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
             >
               <Icon size={10} /> {t.label} {t.count > 0 && <span style={{ color: active ? C.paper : C.dim }}>{t.count}</span>}
             </button>

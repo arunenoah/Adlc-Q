@@ -83,7 +83,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
           Generates graph impact analysis from <code>{project.workspacePath || "(no workspace path)"}/graphify-out/graph.json</code> and breaks the feature into role-bound subtasks.
         </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>title</div>
+          <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 4 }}>title</div>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -92,13 +92,13 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
           />
         </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>type</div>
+          <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 4 }}>type</div>
           <div style={{ display: "flex", gap: 6 }}>
             {(["feature", "bug", "api"] as EpicType[]).map((t) => (
               <button
                 key={t}
                 onClick={() => setType(t)}
-                style={{ ...mono, fontSize: 10, padding: "6px 12px", border: `1px solid ${C.line}`, background: type === t ? C.ink : C.paper, color: type === t ? C.paper : C.ink, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.12em" }}
+                style={{ ...mono, fontSize: 10, padding: "6px 12px", border: `1px solid ${C.line}`, background: type === t ? C.ink : C.paper, color: type === t ? C.paper : C.ink, cursor: "pointer", letterSpacing: "0.12em" }}
               >
                 {t}
               </button>
@@ -106,7 +106,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
           </div>
         </div>
         <div style={{ marginBottom: 14 }}>
-          <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>brief (used as graph keywords)</div>
+          <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 4 }}>brief (used as graph keywords)</div>
           <textarea
             value={brief}
             onChange={(e) => setBrief(e.target.value)}
@@ -116,7 +116,7 @@ export const FeatureWizard = ({ project, onClose, onCreated }: Props) => {
           />
         </div>
         <div style={{ marginBottom: 14 }}>
-          <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
+          <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
             <span>subtasks ({selectedKeys.size}/{tmpl.length})</span>
             <span>
               <button

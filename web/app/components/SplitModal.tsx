@@ -35,7 +35,7 @@ export const SplitModal = ({ state, workspacePath, onChangeSpecPath, onCancel, o
         Reads spec from a file in <code>{workspacePath}</code>, asks the writer model to emit ONLY a <code>parallel_subtasks</code> JSON block, parses it, and replaces the static impl rows with one row per parallel task.
       </div>
       <div style={{ marginBottom: 10 }}>
-        <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>spec file (relative or absolute)</div>
+        <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 4 }}>spec file (relative or absolute)</div>
         <input
           value={state.specPath}
           onChange={(e) => onChangeSpecPath(e.target.value)}

@@ -72,7 +72,7 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               </div>
               {top.length > 0 && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 4 }}>God Nodes</div>
+                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>God Nodes</div>
                   {top.map((g) => (
                     <div key={g.name} style={{ ...mono, fontSize: 10, display: "flex", justifyContent: "space-between", padding: "2px 0" }}>
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginRight: 8 }}>{g.name}</span>
@@ -83,7 +83,7 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               )}
               {d.graphMeta.suggestedQuestions.length > 0 && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 4 }}>
+                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>
                     <Sparkles size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />Suggested
                   </div>
                   <div style={{ ...mono, fontSize: 10, color: C.ink, lineHeight: 1.4 }}>
@@ -93,7 +93,7 @@ export const ImportFromWorkspace = ({ projects, importedPaths, onImport }: Props
               )}
               {(d.skills.length > 0 || d.agents.length > 0 || d.commands.length > 0) && (
                 <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px dashed ${C.dim}` }}>
-                  <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 4 }}>
+                  <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 4 }}>
                     <Sparkles size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
                     .claude — {d.skills.length} skills · {d.agents.length} agents · {d.commands.length} commands
                   </div>

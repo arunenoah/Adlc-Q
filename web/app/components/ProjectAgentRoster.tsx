@@ -84,7 +84,7 @@ export const ProjectAgentRoster = ({ project, clis, activeAgent, onUpdateProject
 
   return (
     <div style={{ border: `1px solid ${C.line}`, padding: 10, marginBottom: 12 }}>
-      <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
         <Bot size={10} /> project agents — {agents.length} configured · {missingRoles.length} missing role{missingRoles.length === 1 ? "" : "s"}
       </div>
       {agents.length > 0 && (
@@ -132,7 +132,7 @@ export const ProjectAgentRoster = ({ project, clis, activeAgent, onUpdateProject
       )}
       {missingRoles.length > 0 && (
         <div style={{ borderTop: agents.length ? `1px dashed ${C.dim}` : "none", paddingTop: agents.length ? 10 : 0 }}>
-          <div style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.warn, marginBottom: 6 }}>
+          <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.warn, marginBottom: 6 }}>
             <AlertCircle size={9} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} /> Missing — build agent connected to skills
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>

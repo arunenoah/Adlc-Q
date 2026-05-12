@@ -29,7 +29,7 @@ export const EpicGraphImpact = ({ impact }: { impact?: GraphImpact }) => {
     <div style={{ border: `1px solid ${C.soft}`, padding: 8, marginBottom: 6, background: "#f6f5f0" }}>
       <div
         onClick={() => setOpen(!open)}
-        style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: C.swarm, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+        style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.swarm, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
       >
         {open ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
         <Network size={10} /> graph impact — {impact!.matchedNodes.length} top matches · {impact!.totalMatches} total · {impact!.affectedFiles.length} files · {impact!.touchedGodNodes.length} god-nodes touched

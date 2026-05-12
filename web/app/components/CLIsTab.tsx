@@ -40,7 +40,7 @@ export const CLIsTab = ({ clis, onToggle }: Props) => (
               {active ? <Tag color={C.ok}>connected</Tag> : <Tag color={C.dim}>not connected</Tag>}
             </div>
 
-            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 6, letterSpacing: "0.1em", textTransform: "uppercase" }}>variants</div>
+            <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 6, letterSpacing: "0.1em" }}>variants</div>
             {m.variants.map((v) => (
               <div
                 key={v.id}

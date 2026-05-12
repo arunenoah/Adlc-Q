@@ -35,7 +35,7 @@ type Props = {
 
 export const KanbanBoard = ({ byStage, taskBusy, taskStart, taskLogs, taskVariantId, onOpenLog }: Props) => (
   <>
-    <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8 }}>
+    <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 8 }}>
       <Layers size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
       stages
     </div>
@@ -43,7 +43,7 @@ export const KanbanBoard = ({ byStage, taskBusy, taskStart, taskLogs, taskVarian
       {STAGES.map((stage) => (
         <div key={stage.id} style={{ border: `1px solid ${C.line}`, background: C.paper, minHeight: 200 }}>
           <div style={{ padding: "8px 10px", borderBottom: `1px solid ${C.line}`, background: stageColor(stage.id), color: C.paper, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ ...mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase" }}>{stage.label}</span>
+            <span style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.text2 }}>{stage.label}</span>
             <span style={{ ...mono, fontSize: 9 }}>{(byStage[stage.id] || []).length}</span>
           </div>
           <div style={{ padding: 6, display: "flex", flexDirection: "column", gap: 4 }}>

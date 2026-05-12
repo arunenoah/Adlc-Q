@@ -719,7 +719,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
           <ArrowLeft size={14} />
         </button>
         <div style={{ flex: 1 }}>
-          <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.14em" }}>PROJECT · PM: {project.pm}</div>
+          <div style={{ ...mono, fontSize: 11, color: C.text3 }}>PROJECT · PM: {project.pm}</div>
           <div style={{ ...serif, fontSize: 24, fontWeight: 600 }}>{project.name}</div>
         </div>
         <Btn onClick={() => setShowRouting(!showRouting)}><Settings size={11} /> routing</Btn>
@@ -804,7 +804,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
         onUpdateProject={onUpdateProject}
       />
       <div style={{ border: `1px solid ${C.line}`, padding: 10, marginBottom: 12 }}>
-        <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 6 }}>
+        <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 6 }}>
           <Bot size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
           standard role coverage · model assignment
         </div>
@@ -855,7 +855,7 @@ const ProjectBoard = ({ project, onBack, clis, onUpdateProject }) => {
       <ProjectClaudeAssets project={project} />
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ ...mono, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: C.dim, marginBottom: 8 }}>epics</div>
+        <div style={{ ...mono, fontSize: 11, fontWeight: 500, color: C.dim, marginBottom: 8 }}>epics</div>
         {project.epics.map((epic) => (
           <EpicCard
             key={epic.id}
@@ -931,7 +931,7 @@ const ProjectsList = ({ projects, onOpen, onNew, onDelete }) => (
               <X size={11} />
             </button>
             <div onClick={() => onOpen(p)} style={{ cursor: "pointer" }}>
-              <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.14em" }}>
+              <div style={{ ...mono, fontSize: 11, color: C.text3 }}>
                 PM · {p.pm}{isWorkspaceProject && " · WORKSPACE"}
               </div>
               <div style={{ ...serif, fontSize: 18, marginTop: 4, paddingRight: 18 }}>{p.name}</div>
@@ -1077,7 +1077,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
             <div style={{ position: "absolute", inset: 3, background: C.accent }} />
           </div>
           <div style={{ ...serif, fontSize: 18, fontWeight: 600 }}>Adlc-Q</div>
-          <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.14em" }}>v0.7 · BYO-CLI</div>
+          <div style={{ ...mono, fontSize: 11, color: C.text3 }}>v0.7 · BYO-CLI</div>
         </div>
       </div>
 
@@ -1087,7 +1087,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
           const active = tab === t.id;
           return (
             <button key={t.id} onClick={() => { setTab(t.id); setOpenProject(null); setCreating(false); }}
-              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: "none", borderRight: `1px solid ${C.line}`, padding: "12px 18px", ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+              style={{ background: active ? C.ink : "transparent", color: active ? C.paper : C.ink, border: "none", borderRight: `1px solid ${C.line}`, padding: "12px 18px", ...mono, fontSize: 12, fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
               <Icon size={12} />
               {t.label}
               {t.count !== undefined && (
@@ -1148,7 +1148,7 @@ export function DevOSShell({ initialProjects, initialClis, discoveredProjects })
         )}
       </div>
 
-      <div style={{ borderTop: `1px solid ${C.line}`, padding: "10px 20px", ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.14em", textTransform: "uppercase", display: "flex", justifyContent: "space-between" }}>
+      <div style={{ borderTop: `1px solid ${C.line}`, padding: "10px 20px", ...mono, fontSize: 11, color: C.text3, display: "flex", justifyContent: "space-between" }}>
         <span>devos · per-agent model routing</span>
         <span>right model · right job</span>
       </div>

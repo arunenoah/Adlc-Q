@@ -23,13 +23,13 @@ export const EpicReviewModal = ({ gate }: { gate: EpicReviewGate }) => {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
       <div style={{ background: C.paper, border: `1px solid ${C.line}`, padding: 18, width: 720, maxWidth: "92vw", maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
         <div style={{ ...serif, fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Review: {gate.taskTitle}</div>
-        <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
+        <div style={{ ...mono, fontSize: 9, color: C.dim, marginBottom: 8 }}>
           step output ({gate.taskKey})
         </div>
         <pre style={{ ...mono, fontSize: 11, color: C.ink, background: "#f6f5f0", border: `1px solid ${C.soft}`, padding: 10, overflow: "auto", maxHeight: "40vh", whiteSpace: "pre-wrap" }}>
           {gate.output || "(no output)"}
         </pre>
-        <div style={{ ...mono, fontSize: 9, color: C.dim, letterSpacing: "0.12em", textTransform: "uppercase", margin: "10px 0 4px" }}>
+        <div style={{ ...mono, fontSize: 9, color: C.dim, margin: "10px 0 4px" }}>
           your note / answer (optional, fed to next step)
         </div>
         <textarea

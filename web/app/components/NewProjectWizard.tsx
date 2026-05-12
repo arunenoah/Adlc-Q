@@ -24,7 +24,7 @@ type StackPickerProps = {
 
 const StackPicker = ({ label, icon: Icon, opts, value, onChange }: StackPickerProps) => (
   <div style={{ marginBottom: 12 }}>
-    <div style={{ ...mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+    <div style={{ ...mono, fontSize: 12, fontWeight: 500, color: C.dim, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
       <Icon size={11} /> {label}
     </div>
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -71,7 +71,7 @@ export const NewProjectWizard = ({ onCreate, onCancel, clis }: Props) => {
       </div>
 
       <div style={{ marginBottom: 12 }}>
-        <div style={{ ...mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>Project name</div>
+        <div style={{ ...mono, fontSize: 12, fontWeight: 500, color: C.dim, marginBottom: 4 }}>Project name</div>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -81,7 +81,7 @@ export const NewProjectWizard = ({ onCreate, onCancel, clis }: Props) => {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ ...mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 4 }}>PM</div>
+        <div style={{ ...mono, fontSize: 12, fontWeight: 500, color: C.dim, marginBottom: 4 }}>PM</div>
         <input
           value={pm}
           onChange={(e) => setPm(e.target.value)}
@@ -104,7 +104,7 @@ export const NewProjectWizard = ({ onCreate, onCancel, clis }: Props) => {
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <div style={{ ...mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: C.dim, marginBottom: 6 }}>
+        <div style={{ ...mono, fontSize: 12, fontWeight: 500, color: C.dim, marginBottom: 6 }}>
           Initial epics
         </div>
         <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
